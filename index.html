@@ -1,277 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TRT Tracker - Operation Controller</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-100 min-h-screen p-3 md:p-8 font-sans">
-  <div class="max-w-3xl mx-auto space-y-6">
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var p = e.parameter;
     
-    <!-- HEADER -->
-    <div class="bg-blue-900 text-white p-6 rounded-xl shadow-xl flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold">TRT Tracker Terminal</h1>
-        <p class="text-blue-200 text-sm">Operation Controller Logging</p>
-      </div>
-      <button onclick="fetchActiveTrucks()" class="bg-blue-800 hover:bg-blue-700 text-xs px-3 py-2 rounded-lg border border-blue-600 transition">
-        🔄 Refresh List
-      </button>
-    </div>
+    var truckNo = (p.truckNo || "").trim();
+    var driverName = (p.driverName || "").trim();
+    var soNo = (p.soNo || "").trim();
+    var ocName = (p.ocName || "").trim();
+    var gateIn = p.gateIn || "";
+    var bayIn = p.bayIn || "";
+    var bayOut = p.bayOut || "";
+    var gateOut = p.gateOut || "";
+    var delayReason = p.delayReason || "";
+    var ocNotes = p.ocNotes || "";
 
-    <!-- NON CHECKED-OUT TRUCKS QUEUE -->
-    <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="text-lg font-bold text-slate-800">Non Checked-Out Trucks (In Yard)</h2>
-        <span id="activeCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">0 Active</span>
-      </div>
-      <p class="text-xs text-slate-500 mb-3">Tap any truck card to load its record into the form for updating or completing checkout.</p>
-      
-      <div id="activeTrucksList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-64 overflow-y-auto p-1">
-        <div class="text-sm text-slate-400 italic col-span-3">Loading active trucks...</div>
-      </div>
-    </div>
+    // Calculate times in minutes
+    var parkingTime = calculateDiffInMinutes(gateIn, bayIn);
+    var loadingTime = calculateDiffInMinutes(bayIn, bayOut);
+    var totalTRT = calculateDiffInMinutes(gateIn, gateOut);
 
-    <!-- FORM SECTION -->
-    <div class="bg-white p-6 rounded-xl shadow-xl border border-slate-200">
-      <h2 class="text-lg font-bold text-slate-800 mb-4" id="formHeader">Log New Truck / Complete Checkout</h2>
-      
-      <form id="trtForm" class="space-y-4">
-        <!-- TRUCK, DRIVER, SO, OC INFO -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Truck / Plate No. *</label>
-            <input type="text" id="truckNo" required placeholder="e.g. 3-12345" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Driver Name</label>
-            <input type="text" id="driverName" placeholder="Driver Name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">SO Number</label>
-            <input type="text" id="soNo" placeholder="Sales Order Number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">OC Name</label>
-            <input type="text" id="ocName" placeholder="Controller Name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-        </div>
+    var data = sheet.getDataRange().getValues();
+    var foundIndex = -1;
 
-        <!-- TIMESTAMPS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">1. Gate In</label>
-            <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">2. Bay In</label>
-            <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">3. Bay Out</label>
-            <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">4. Gate Out</label>
-            <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
-          </div>
-        </div>
+    // Search for existing active record (without Gate Out) matching Truck No or SO No
+    for (var i = 1; i < data.length; i++) {
+      var rowTruck = String(data[i][0]).trim();
+      var rowSO = String(data[i][2]).trim();
+      var rowGateOut = data[i][7];
 
-        <!-- LIVE CALCULATED METRICS SUMMARY -->
-        <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
-          <div>
-            <span class="block text-[10px] font-bold text-slate-500 uppercase">Parking Time</span>
-            <span id="dispParking" class="text-sm font-bold text-blue-900">-- min</span>
-          </div>
-          <div>
-            <span class="block text-[10px] font-bold text-slate-500 uppercase">Loading/Unloading</span>
-            <span id="dispLoading" class="text-sm font-bold text-blue-900">-- min</span>
-          </div>
-          <div>
-            <span class="block text-[10px] font-bold text-slate-500 uppercase">Total TRT</span>
-            <span id="dispTotal" class="text-sm font-bold text-blue-900">-- min</span>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Delay Reason (If applicable)</label>
-          <select id="delayReason" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none">
-            <option value="On Time">None (On Time)</option>
-            <option value="Bay Congestion">Bay Congestion</option>
-            <option value="Forklift Downtime">Forklift Downtime</option>
-            <option value="Documentation Delay">Documentation Delay</option>
-            <option value="Staging Area Wait">Staging Area Wait</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">OC Operational Notes</label>
-          <textarea id="ocNotes" rows="2" placeholder="Add additional remarks..." class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"></textarea>
-        </div>
-
-        <div class="flex gap-2">
-          <button type="submit" id="submitBtn" class="flex-1 bg-blue-800 hover:bg-blue-900 text-white font-bold py-3.5 px-4 rounded-lg transition duration-200 shadow-md">
-            Submit / Update Record
-          </button>
-          <button type="button" onclick="clearForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-3.5 rounded-lg">
-            Clear
-          </button>
-        </div>
-      </form>
-
-      <div id="statusMsg" class="hidden p-4 mt-4 text-center rounded-lg font-medium"></div>
-    </div>
-  </div>
-
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQQzuTdknhYrhpkjSm0IRmEMCBmm-pkr03UTKwpYwl_mKfBA9DJ3iXY44L-Wmtpgxk/exec";
-    let activeTrucksData = [];
-
-    function formatDateForInput(dateStr) {
-      if (!dateStr) return "";
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return "";
-      const pad = (n) => (n < 10 ? '0' + n : n);
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    }
-
-    // Real-time calculation on form display
-    function calculateMetrics() {
-      const gIn = document.getElementById('gateIn').value;
-      const bIn = document.getElementById('bayIn').value;
-      const bOut = document.getElementById('bayOut').value;
-      const gOut = document.getElementById('gateOut').value;
-
-      let pMin = "--", lMin = "--", tMin = "--";
-
-      if (gIn && bIn) {
-        const diff = Math.round((new Date(bIn) - new Date(gIn)) / (1000 * 60));
-        pMin = (diff >= 0 ? diff : 0) + " min";
-      }
-      if (bIn && bOut) {
-        const diff = Math.round((new Date(bOut) - new Date(bIn)) / (1000 * 60));
-        lMin = (diff >= 0 ? diff : 0) + " min";
-      }
-      if (gIn && gOut) {
-        const diff = Math.round((new Date(gOut) - new Date(gIn)) / (1000 * 60));
-        tMin = (diff >= 0 ? diff : 0) + " min";
-      }
-
-      document.getElementById('dispParking').innerText = pMin;
-      document.getElementById('dispLoading').innerText = lMin;
-      document.getElementById('dispTotal').innerText = tMin;
-    }
-
-    // Fetch active non-checked-out trucks
-    async function fetchActiveTrucks() {
-      const listContainer = document.getElementById('activeTrucksList');
-      const countBadge = document.getElementById('activeCount');
-      listContainer.innerHTML = `<div class="text-sm text-slate-400 italic col-span-3">Loading active trucks...</div>`;
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=getActive`);
-        const trucks = await response.json();
-        activeTrucksData = trucks;
-
-        countBadge.innerText = `${trucks.length} Non Checked-Out`;
-
-        if (trucks.length === 0) {
-          listContainer.innerHTML = `<div class="text-sm text-slate-400 italic col-span-3">No non checked-out trucks in yard.</div>`;
-          return;
-        }
-
-        listContainer.innerHTML = trucks.map((t, idx) => `
-          <div onclick="selectTruck(${idx})" class="p-3 bg-amber-50 border border-amber-200 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition shadow-sm">
-            <div class="flex justify-between items-center mb-1">
-              <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
-              <span class="text-[10px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded font-semibold">In Yard</span>
-            </div>
-            <div class="text-xs text-slate-600 space-y-0.5">
-              <p><b>SO:</b> ${t.soNo || 'N/A'}</p>
-              <p><b>Gate In:</b> ${t.gateIn ? new Date(t.gateIn).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A'}</p>
-            </div>
-          </div>
-        `).join('');
-
-      } catch (err) {
-        listContainer.innerHTML = `<div class="text-sm text-red-500 italic col-span-3">Could not load active list. Click Refresh.</div>`;
+      if ((rowTruck === truckNo || (soNo !== "" && rowSO === soNo)) && (!rowGateOut || rowGateOut === "")) {
+        foundIndex = i + 1; // 1-based index
+        break;
       }
     }
 
-    function selectTruck(index) {
-      const t = activeTrucksData[index];
-      if (!t) return;
-
-      document.getElementById('truckNo').value = t.truckNo || "";
-      document.getElementById('driverName').value = t.driverName || "";
-      document.getElementById('soNo').value = t.soNo || "";
-      document.getElementById('ocName').value = t.ocName || "";
-      document.getElementById('gateIn').value = formatDateForInput(t.gateIn);
-      document.getElementById('bayIn').value = formatDateForInput(t.bayIn);
-      document.getElementById('bayOut').value = formatDateForInput(t.bayOut);
-      document.getElementById('gateOut').value = formatDateForInput(t.gateOut);
-      document.getElementById('delayReason').value = t.delayReason || "On Time";
-      document.getElementById('ocNotes').value = t.ocNotes || "";
-
-      calculateMetrics();
-      document.getElementById('formHeader').innerText = `Updating Checkout: ${t.truckNo}`;
-      window.scrollTo({ top: document.getElementById('trtForm').offsetTop - 20, behavior: 'smooth' });
+    if (foundIndex > 0) {
+      // Update existing record
+      if (driverName) sheet.getRange(foundIndex, 2).setValue(driverName);
+      if (soNo) sheet.getRange(foundIndex, 3).setValue(soNo);
+      if (ocName) sheet.getRange(foundIndex, 4).setValue(ocName);
+      if (gateIn) sheet.getRange(foundIndex, 5).setValue(gateIn);
+      if (bayIn) sheet.getRange(foundIndex, 6).setValue(bayIn);
+      if (bayOut) sheet.getRange(foundIndex, 7).setValue(bayOut);
+      if (gateOut) sheet.getRange(foundIndex, 8).setValue(gateOut);
+      sheet.getRange(foundIndex, 9).setValue(parkingTime);
+      sheet.getRange(foundIndex, 10).setValue(loadingTime);
+      sheet.getRange(foundIndex, 11).setValue(totalTRT);
+      sheet.getRange(foundIndex, 12).setValue(delayReason);
+      sheet.getRange(foundIndex, 13).setValue(ocNotes);
+    } else {
+      // Append new record
+      sheet.appendRow([
+        truckNo,
+        driverName,
+        soNo,
+        ocName,
+        gateIn,
+        bayIn,
+        bayOut,
+        gateOut,
+        parkingTime,
+        loadingTime,
+        totalTRT,
+        delayReason,
+        ocNotes
+      ]);
     }
 
-    function clearForm() {
-      document.getElementById('trtForm').reset();
-      document.getElementById('dispParking').innerText = "-- min";
-      document.getElementById('dispLoading').innerText = "-- min";
-      document.getElementById('dispTotal').innerText = "-- min";
-      document.getElementById('formHeader').innerText = "Log New Truck / Complete Checkout";
-    }
+    return ContentService.createTextOutput(JSON.stringify({ status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
 
-    // Submit form
-    document.getElementById('trtForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const msg = document.getElementById('statusMsg');
-      
-      btn.disabled = true;
-      btn.innerText = 'Updating...';
-      msg.classList.add('hidden');
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-      const formData = new URLSearchParams();
-      formData.append('truckNo', document.getElementById('truckNo').value);
-      formData.append('driverName', document.getElementById('driverName').value);
-      formData.append('soNo', document.getElementById('soNo').value);
-      formData.append('ocName', document.getElementById('ocName').value);
-      formData.append('gateIn', document.getElementById('gateIn').value);
-      formData.append('bayIn', document.getElementById('bayIn').value);
-      formData.append('bayOut', document.getElementById('bayOut').value);
-      formData.append('gateOut', document.getElementById('gateOut').value);
-      formData.append('delayReason', document.getElementById('delayReason').value);
-      formData.append('ocNotes', document.getElementById('ocNotes').value);
+function calculateDiffInMinutes(startStr, endStr) {
+  if (!startStr || !endStr) return "";
+  var start = new Date(startStr);
+  var end = new Date(endStr);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return "";
+  var diff = Math.round((end - start) / (1000 * 60));
+  return diff >= 0 ? diff : 0;
+}
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: formData.toString()
+function doGet(e) {
+  e = e || { parameter: {} };
+  var action = e.parameter.action || "";
+
+  if (action === "getActive") {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = sheet.getDataRange().getValues();
+    var activeTrucks = [];
+
+    for (var i = 1; i < data.length; i++) {
+      var rowGateOut = data[i][7];
+      if (!rowGateOut || rowGateOut === "") {
+        activeTrucks.push({
+          truckNo: data[i][0],
+          driverName: data[i][1],
+          soNo: data[i][2],
+          ocName: data[i][3],
+          gateIn: data[i][4],
+          bayIn: data[i][5],
+          bayOut: data[i][6],
+          gateOut: data[i][7],
+          parkingTime: data[i][8],
+          loadingTime: data[i][9],
+          totalTRT: data[i][10],
+          delayReason: data[i][11],
+          ocNotes: data[i][12]
         });
-
-        msg.innerText = 'Record updated successfully!';
-        msg.className = 'p-4 mt-4 text-center rounded-lg font-medium bg-green-100 text-green-800 border border-green-200';
-        clearForm();
-        setTimeout(fetchActiveTrucks, 1500);
-      } catch (err) {
-        msg.innerText = 'Error submitting record. Please try again.';
-        msg.className = 'p-4 mt-4 text-center rounded-lg font-medium bg-red-100 text-red-800 border border-red-200';
-      } finally {
-        msg.classList.remove('hidden');
-        btn.disabled = false;
-        btn.innerText = 'Submit / Update Record';
       }
-    });
+    }
 
-    fetchActiveTrucks();
-  </script>
-</body>
-</html>
+    return ContentService.createTextOutput(JSON.stringify(activeTrucks))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService.createTextOutput("TRT API Active");
+}
