@@ -244,12 +244,16 @@
       document.getElementById('dispTotal').innerText = tMin;
     }
 
-    function getElapsedTimeMinutes(startTimeStr) {
-      if (!startTimeStr) return 0;
-      const start = new Date(startTimeStr);
+    // Calculate time gap in minutes between two datetimes (or now if end is missing)
+    function getDiffInMinutes(startStr, endStr) {
+      if (!startStr) return 0;
+      const start = new Date(startStr);
       if (isNaN(start.getTime())) return 0;
-      const now = new Date();
-      const diffMin = Math.round((now - start) / (1000 * 60));
+
+      const end = endStr ? new Date(endStr) : new Date();
+      if (isNaN(end.getTime())) return 0;
+
+      const diffMin = Math.round((end - start) / (1000 * 60));
       return diffMin >= 0 ? diffMin : 0;
     }
 
@@ -276,9 +280,9 @@
         const parkingTrucks = [];
         const bayTrucks = [];
 
-        // Categorize trucks based on timestamp progress
+        // Categorize trucks
         trucks.forEach((t, idx) => {
-          t.originalIndex = idx; // Keep reference to main data array
+          t.originalIndex = idx;
           if (t.gateIn && (!t.bayIn || t.bayIn === "")) {
             parkingTrucks.push(t);
           } else if (t.bayIn) {
@@ -289,22 +293,27 @@
         document.getElementById('parkingCount').innerText = `${parkingTrucks.length} Trucks`;
         document.getElementById('bayCount').innerText = `${bayTrucks.length} Trucks`;
 
-        // RENDER PARKING QUEUE
+        // 1. RENDER PARKING QUEUE: (Gate In -> Bay In or Now)
         if (parkingTrucks.length === 0) {
           parkingContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No trucks in parking yard.</div>`;
         } else {
           parkingContainer.innerHTML = parkingTrucks.map(t => {
-            const elapsed = getElapsedTimeMinutes(t.gateIn);
-            const isDelayed = elapsed > 180; // 3 hours (180 mins)
-            const badgeClass = isDelayed ? "bg-red-100 text-red-800 border-red-300" : "bg-emerald-100 text-emerald-800 border-emerald-300";
-            const cardBorder = isDelayed ? "border-red-300 bg-red-50/50" : "border-slate-200 bg-slate-50";
+            const parkingMinutes = getDiffInMinutes(t.gateIn, t.bayIn);
+            const isDelayed = parkingMinutes > 180; // Greater than 3 hrs (180 mins)
+            
+            const badgeClass = isDelayed 
+              ? "bg-red-100 text-red-800 border-red-300" 
+              : "bg-emerald-100 text-emerald-800 border-emerald-300";
+            const cardBorder = isDelayed 
+              ? "border-red-300 bg-red-50/50" 
+              : "border-slate-200 bg-slate-50";
 
             return `
               <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} active:bg-blue-100 transition shadow-sm cursor-pointer">
                 <div class="flex justify-between items-center mb-1">
                   <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
                   <span class="text-[10px] border ${badgeClass} px-2 py-0.5 rounded-full font-bold">
-                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${formatHours(elapsed)})
+                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${formatHours(parkingMinutes)})
                   </span>
                 </div>
                 <div class="text-xs text-slate-600 flex justify-between">
@@ -316,30 +325,27 @@
           }).join('');
         }
 
-        // RENDER BAY QUEUE
+        // 2. RENDER BAY QUEUE: (Bay In -> Bay Out or Now)
         if (bayTrucks.length === 0) {
           bayContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No trucks at loading bays.</div>`;
         } else {
           bayContainer.innerHTML = bayTrucks.map(t => {
-            let elapsed = 0;
-            if (t.bayOut) {
-              // If finished loading but waiting for Gate Out
-              elapsed = calculateDiffInMinutes(t.bayIn, t.bayOut);
-            } else {
-              // Still actively loading
-              elapsed = getElapsedTimeMinutes(t.bayIn);
-            }
+            const bayMinutes = getDiffInMinutes(t.bayIn, t.bayOut);
+            const isDelayed = bayMinutes > 180; // Greater than 3 hrs (180 mins)
 
-            const isDelayed = elapsed > 180; // 3 hours (180 mins)
-            const badgeClass = isDelayed ? "bg-red-100 text-red-800 border-red-300" : "bg-emerald-100 text-emerald-800 border-emerald-300";
-            const cardBorder = isDelayed ? "border-red-300 bg-red-50/50" : "border-slate-200 bg-slate-50";
+            const badgeClass = isDelayed 
+              ? "bg-red-100 text-red-800 border-red-300" 
+              : "bg-emerald-100 text-emerald-800 border-emerald-300";
+            const cardBorder = isDelayed 
+              ? "border-red-300 bg-red-50/50" 
+              : "border-slate-200 bg-slate-50";
 
             return `
               <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} active:bg-blue-100 transition shadow-sm cursor-pointer">
                 <div class="flex justify-between items-center mb-1">
                   <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
                   <span class="text-[10px] border ${badgeClass} px-2 py-0.5 rounded-full font-bold">
-                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${formatHours(elapsed)})
+                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${formatHours(bayMinutes)})
                   </span>
                 </div>
                 <div class="text-xs text-slate-600 flex justify-between">
