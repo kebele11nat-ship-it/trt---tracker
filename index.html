@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>TRT Mobile Tracker</title>
 
-  <!-- PWA Web App Manifest -->
   <link rel="manifest" href="data:application/manifest+json;utf8,{
     %22name%22:%22TRT%20Yard%20Tracker%22,
     %22short_name%22:%22TRT%20App%22,
@@ -111,7 +110,7 @@
           </div>
         </div>
 
-        <!-- MOBILE TIMESTAMPS WITH 1-TAP NOW BUTTONS -->
+        <!-- TIMESTAMPS -->
         <div class="space-y-3 pt-2">
           <div>
             <div class="flex justify-between items-center mb-1">
@@ -146,19 +145,19 @@
           </div>
         </div>
 
-        <!-- METRICS DISPLAY CARD -->
+        <!-- METRICS DISPLAY CARD (HOURS) -->
         <div class="grid grid-cols-3 gap-1 bg-slate-800 text-white p-3 rounded-xl text-center shadow-inner mt-3">
           <div>
-            <span class="block text-[9px] font-bold text-slate-400 uppercase">Parking</span>
-            <span id="dispParking" class="text-xs font-bold text-amber-300">-- min</span>
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Parking Time</span>
+            <span id="dispParking" class="text-xs font-bold text-amber-300">-- hrs</span>
           </div>
           <div>
-            <span class="block text-[9px] font-bold text-slate-400 uppercase">Loading</span>
-            <span id="dispLoading" class="text-xs font-bold text-amber-300">-- min</span>
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Loading Time</span>
+            <span id="dispLoading" class="text-xs font-bold text-amber-300">-- hrs</span>
           </div>
           <div>
             <span class="block text-[9px] font-bold text-slate-400 uppercase">Total TRT</span>
-            <span id="dispTotal" class="text-xs font-bold text-green-400">-- min</span>
+            <span id="dispTotal" class="text-xs font-bold text-green-400">-- hrs</span>
           </div>
         </div>
 
@@ -218,34 +217,34 @@
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
+    // CALCULATE METRICS IN HOURS
     function calculateMetrics() {
       const gIn = document.getElementById('gateIn').value;
       const bIn = document.getElementById('bayIn').value;
       const bOut = document.getElementById('bayOut').value;
       const gOut = document.getElementById('gateOut').value;
 
-      let pMin = "--", lMin = "--", tMin = "--";
+      let pHrs = "--", lHrs = "--", tHrs = "--";
 
       if (gIn && bIn) {
-        const diff = Math.round((new Date(bIn) - new Date(gIn)) / (1000 * 60));
-        pMin = (diff >= 0 ? diff : 0) + " min";
+        const diffHrs = ((new Date(bIn) - new Date(gIn)) / (1000 * 60 * 60)).toFixed(1);
+        pHrs = (diffHrs >= 0 ? diffHrs : 0) + " hrs";
       }
       if (bIn && bOut) {
-        const diff = Math.round((new Date(bOut) - new Date(bIn)) / (1000 * 60));
-        lMin = (diff >= 0 ? diff : 0) + " min";
+        const diffHrs = ((new Date(bOut) - new Date(bIn)) / (1000 * 60 * 60)).toFixed(1);
+        lHrs = (diffHrs >= 0 ? diffHrs : 0) + " hrs";
       }
       if (gIn && gOut) {
-        const diff = Math.round((new Date(gOut) - new Date(gIn)) / (1000 * 60));
-        tMin = (diff >= 0 ? diff : 0) + " min";
+        const diffHrs = ((new Date(gOut) - new Date(gIn)) / (1000 * 60 * 60)).toFixed(1);
+        tHrs = (diffHrs >= 0 ? diffHrs : 0) + " hrs";
       }
 
-      document.getElementById('dispParking').innerText = pMin;
-      document.getElementById('dispLoading').innerText = lMin;
-      document.getElementById('dispTotal').innerText = tMin;
+      document.getElementById('dispParking').innerText = pHrs;
+      document.getElementById('dispLoading').innerText = lHrs;
+      document.getElementById('dispTotal').innerText = tHrs;
     }
 
-    // Calculate time gap in minutes between two datetimes (or now if end is missing)
-    function getDiffInMinutes(startStr, endStr) {
+    function getDiffInHours(startStr, endStr) {
       if (!startStr) return 0;
       const start = new Date(startStr);
       if (isNaN(start.getTime())) return 0;
@@ -253,13 +252,8 @@
       const end = endStr ? new Date(endStr) : new Date();
       if (isNaN(end.getTime())) return 0;
 
-      const diffMin = Math.round((end - start) / (1000 * 60));
-      return diffMin >= 0 ? diffMin : 0;
-    }
-
-    function formatHours(minutes) {
-      const hrs = (minutes / 60).toFixed(1);
-      return `${minutes} min (${hrs} hrs)`;
+      const diffHrs = (end - start) / (1000 * 60 * 60);
+      return diffHrs >= 0 ? diffHrs : 0;
     }
 
     async function fetchActiveTrucks() {
@@ -280,7 +274,6 @@
         const parkingTrucks = [];
         const bayTrucks = [];
 
-        // Categorize trucks
         trucks.forEach((t, idx) => {
           t.originalIndex = idx;
           if (t.gateIn && (!t.bayIn || t.bayIn === "")) {
@@ -293,13 +286,13 @@
         document.getElementById('parkingCount').innerText = `${parkingTrucks.length} Trucks`;
         document.getElementById('bayCount').innerText = `${bayTrucks.length} Trucks`;
 
-        // 1. RENDER PARKING QUEUE: (Gate In -> Bay In or Now)
+        // 1. RENDER PARKING QUEUE
         if (parkingTrucks.length === 0) {
           parkingContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No trucks in parking yard.</div>`;
         } else {
           parkingContainer.innerHTML = parkingTrucks.map(t => {
-            const parkingMinutes = getDiffInMinutes(t.gateIn, t.bayIn);
-            const isDelayed = parkingMinutes > 180; // Greater than 3 hrs (180 mins)
+            const parkingHours = getDiffInHours(t.gateIn, t.bayIn);
+            const isDelayed = parkingHours > 3.0;
             
             const badgeClass = isDelayed 
               ? "bg-red-100 text-red-800 border-red-300" 
@@ -309,11 +302,11 @@
               : "border-slate-200 bg-slate-50";
 
             return `
-              <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} active:bg-blue-100 transition shadow-sm cursor-pointer">
+              <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} shadow-sm cursor-pointer hover:bg-slate-100 transition">
                 <div class="flex justify-between items-center mb-1">
                   <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
                   <span class="text-[10px] border ${badgeClass} px-2 py-0.5 rounded-full font-bold">
-                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${formatHours(parkingMinutes)})
+                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${parkingHours.toFixed(1)} hrs)
                   </span>
                 </div>
                 <div class="text-xs text-slate-600 flex justify-between">
@@ -325,13 +318,13 @@
           }).join('');
         }
 
-        // 2. RENDER BAY QUEUE: (Bay In -> Bay Out or Now)
+        // 2. RENDER BAY QUEUE
         if (bayTrucks.length === 0) {
           bayContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No trucks at loading bays.</div>`;
         } else {
           bayContainer.innerHTML = bayTrucks.map(t => {
-            const bayMinutes = getDiffInMinutes(t.bayIn, t.bayOut);
-            const isDelayed = bayMinutes > 180; // Greater than 3 hrs (180 mins)
+            const bayHours = getDiffInHours(t.bayIn, t.bayOut);
+            const isDelayed = bayHours > 3.0;
 
             const badgeClass = isDelayed 
               ? "bg-red-100 text-red-800 border-red-300" 
@@ -341,11 +334,11 @@
               : "border-slate-200 bg-slate-50";
 
             return `
-              <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} active:bg-blue-100 transition shadow-sm cursor-pointer">
+              <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} shadow-sm cursor-pointer hover:bg-slate-100 transition">
                 <div class="flex justify-between items-center mb-1">
                   <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
                   <span class="text-[10px] border ${badgeClass} px-2 py-0.5 rounded-full font-bold">
-                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${formatHours(bayMinutes)})
+                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${bayHours.toFixed(1)} hrs)
                   </span>
                 </div>
                 <div class="text-xs text-slate-600 flex justify-between">
@@ -385,9 +378,9 @@
 
     function clearForm() {
       document.getElementById('trtForm').reset();
-      document.getElementById('dispParking').innerText = "-- min";
-      document.getElementById('dispLoading').innerText = "-- min";
-      document.getElementById('dispTotal').innerText = "-- min";
+      document.getElementById('dispParking').innerText = "-- hrs";
+      document.getElementById('dispLoading').innerText = "-- hrs";
+      document.getElementById('dispTotal').innerText = "-- hrs";
       document.getElementById('formHeader').innerText = "Log Truck Entry / Update";
     }
 
