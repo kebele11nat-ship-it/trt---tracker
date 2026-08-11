@@ -97,9 +97,9 @@
             <input type="text" id="soNo" placeholder="Sales Order" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50" />
           </div>
           <div>
-            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Controller (OC)</label>
+            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Agent / Controller (OC)</label>
             <select id="ocName" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50">
-              <option value="">Select OC</option>
+              <option value="">Select Agent</option>
               <option value="Misgana">Misgana</option>
               <option value="Habtamu">Habtamu</option>
               <option value="Tilahun">Tilahun</option>
@@ -311,7 +311,7 @@
                 </div>
                 <div class="text-xs text-slate-600 flex justify-between">
                   <span><b>SO:</b> ${t.soNo || 'N/A'}</span>
-                  <span><b>OC:</b> ${t.ocName || 'N/A'}</span>
+                  <span class="text-blue-900 font-bold"><b>Agent:</b> ${t.ocName || 'Unassigned'}</span>
                 </div>
               </div>
             `;
@@ -343,7 +343,7 @@
                 </div>
                 <div class="text-xs text-slate-600 flex justify-between">
                   <span><b>SO:</b> ${t.soNo || 'N/A'}</span>
-                  <span><b>OC:</b> ${t.ocName || 'N/A'}</span>
+                  <span class="text-blue-900 font-bold"><b>Agent:</b> ${t.ocName || 'Unassigned'}</span>
                 </div>
               </div>
             `;
