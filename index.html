@@ -29,44 +29,6 @@
 
   <main class="max-w-md mx-auto p-3 space-y-4">
 
-    <!-- AVERAGE PERFORMANCE ANALYTICS CARD -->
-    <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-3">
-      <div class="flex justify-between items-center border-b pb-2">
-        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">📊 Performance Averages</h2>
-        <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Completed Trucks</span>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 text-center">
-        <!-- TODAY -->
-        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
-          <span class="block text-[10px] font-bold text-slate-500 uppercase">Daily (Today)</span>
-          <div class="mt-1">
-            <div class="text-xs font-bold text-blue-900"><span id="avgTrtToday">--</span> <span class="text-[9px] font-normal text-slate-500">TRT</span></div>
-            <div class="text-[11px] font-semibold text-emerald-700"><span id="avgBayToday">--</span> <span class="text-[9px] font-normal text-slate-500">Bay</span></div>
-          </div>
-        </div>
-
-        <!-- WEEKLY -->
-        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
-          <span class="block text-[10px] font-bold text-slate-500 uppercase">Weekly (7d)</span>
-          <div class="mt-1">
-            <div class="text-xs font-bold text-blue-900"><span id="avgTrtWeek">--</span> <span class="text-[9px] font-normal text-slate-500">TRT</span></div>
-            <div class="text-[11px] font-semibold text-emerald-700"><span id="avgBayWeek">--</span> <span class="text-[9px] font-normal text-slate-500">Bay</span></div>
-          </div>
-        </div>
-
-        <!-- MONTHLY -->
-        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
-          <span class="block text-[10px] font-bold text-slate-500 uppercase">Monthly (30d)</span>
-          <div class="mt-1">
-            <div class="text-xs font-bold text-blue-900"><span id="avgTrtMonth">--</span> <span class="text-[9px] font-normal text-slate-500">TRT</span></div>
-            <div class="text-[11px] font-semibold text-emerald-700"><span id="avgBayMonth">--</span> <span class="text-[9px] font-normal text-slate-500">Bay</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="text-[9px] text-slate-400 text-center italic">* TRT = Gate Out - Gate In | Bay Time = Bay Out - Bay In</div>
-    </section>
-
     <!-- CATEGORIZED IN-YARD QUEUE -->
     <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-4">
       <div class="flex justify-between items-center border-b pb-2">
@@ -231,6 +193,60 @@
       <div id="statusMsg" class="hidden p-3 mt-3 text-center rounded-lg font-bold text-sm"></div>
     </section>
 
+    <!-- COMPOSITION OF DELAY REASON -->
+    <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">⚠️ Delay Reason Composition</h2>
+        <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Completed Log</span>
+      </div>
+      <div id="delayCompositionList" class="space-y-2 text-xs">
+        <div class="text-xs text-slate-400 italic">Loading delay stats...</div>
+      </div>
+    </section>
+
+    <!-- PERFORMANCE AVERAGES (MOVED TO LAST ROW) -->
+    <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">📊 Performance Averages</h2>
+        <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Completed Trucks</span>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <!-- TODAY -->
+        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase">Daily (Today)</span>
+          <div class="mt-1 space-y-0.5">
+            <div><span id="avgTrtToday" class="text-xs font-bold">--</span> <span class="text-[9px] text-slate-500">TRT</span></div>
+            <div><span id="avgBayToday" class="text-xs font-semibold">--</span> <span class="text-[9px] text-slate-500">Bay</span></div>
+          </div>
+        </div>
+
+        <!-- WEEKLY -->
+        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase">Weekly (7d)</span>
+          <div class="mt-1 space-y-0.5">
+            <div><span id="avgTrtWeek" class="text-xs font-bold">--</span> <span class="text-[9px] text-slate-500">TRT</span></div>
+            <div><span id="avgBayWeek" class="text-xs font-semibold">--</span> <span class="text-[9px] text-slate-500">Bay</span></div>
+          </div>
+        </div>
+
+        <!-- MONTHLY -->
+        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase">Monthly (30d)</span>
+          <div class="mt-1 space-y-0.5">
+            <div><span id="avgTrtMonth" class="text-xs font-bold">--</span> <span class="text-[9px] text-slate-500">TRT</span></div>
+            <div><span id="avgBayMonth" class="text-xs font-semibold">--</span> <span class="text-[9px] text-slate-500">Bay</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- COLOR KEY LEGEND -->
+      <div class="flex justify-around items-center text-[9px] text-slate-500 pt-1 border-t border-slate-100">
+        <span>🔴 <b>TRT</b> > 6h | 🟢 ≤ 6h</span>
+        <span>🔴 <b>Bay</b> > 3h | 🟢 ≤ 3h</span>
+      </div>
+    </section>
+
   </main>
 
   <script>
@@ -293,14 +309,15 @@
 
     function refreshData() {
       fetchActiveTrucks();
-      fetchCompletedAverages();
+      fetchCompletedAnalytics();
     }
 
-    async function fetchCompletedAverages() {
+    async function fetchCompletedAnalytics() {
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getCompleted`);
         const completed = await response.json();
-        
+
+        // 1. PERFORMANCE AVERAGES
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
@@ -325,24 +342,76 @@
           });
 
           return {
-            trtAvg: trtCount > 0 ? (trtSum / trtCount).toFixed(1) + "h" : "--",
-            bayAvg: bayCount > 0 ? (baySum / bayCount).toFixed(1) + "h" : "--"
+            trtVal: trtCount > 0 ? (trtSum / trtCount) : null,
+            bayVal: bayCount > 0 ? (baySum / bayCount) : null
           };
+        };
+
+        const updateAverageUI = (elementId, value, threshold) => {
+          const el = document.getElementById(elementId);
+          if (value === null) {
+            el.innerText = "--";
+            el.className = "text-xs font-bold text-slate-400";
+            return;
+          }
+          const formatted = value.toFixed(1) + "h";
+          el.innerText = formatted;
+          if (value > threshold) {
+            el.className = "text-xs font-bold text-red-600";
+          } else {
+            el.className = "text-xs font-bold text-emerald-600";
+          }
         };
 
         const todayStats = filterStats(startOfToday);
         const weekStats = filterStats(sevenDaysAgo);
         const monthStats = filterStats(thirtyDaysAgo);
 
-        document.getElementById('avgTrtToday').innerText = todayStats.trtAvg;
-        document.getElementById('avgBayToday').innerText = todayStats.bayAvg;
-        document.getElementById('avgTrtWeek').innerText = weekStats.trtAvg;
-        document.getElementById('avgBayWeek').innerText = weekStats.bayAvg;
-        document.getElementById('avgTrtMonth').innerText = monthStats.trtAvg;
-        document.getElementById('avgBayMonth').innerText = monthStats.bayAvg;
+        // TRT Threshold: 6.0 hrs | Bay Time Threshold: 3.0 hrs
+        updateAverageUI('avgTrtToday', todayStats.trtVal, 6.0);
+        updateAverageUI('avgBayToday', todayStats.bayVal, 3.0);
+
+        updateAverageUI('avgTrtWeek', weekStats.trtVal, 6.0);
+        updateAverageUI('avgBayWeek', weekStats.bayVal, 3.0);
+
+        updateAverageUI('avgTrtMonth', monthStats.trtVal, 6.0);
+        updateAverageUI('avgBayMonth', monthStats.bayVal, 3.0);
+
+        // 2. COMPOSITION OF DELAY REASON
+        const delayCounts = {};
+        let totalDelayedTrucks = 0;
+
+        completed.forEach(t => {
+          const reason = t.delayReason || "On Time";
+          if (reason !== "On Time" && reason !== "None (On Time)") {
+            delayCounts[reason] = (delayCounts[reason] || 0) + 1;
+            totalDelayedTrucks++;
+          }
+        });
+
+        const compositionContainer = document.getElementById('delayCompositionList');
+        if (totalDelayedTrucks === 0) {
+          compositionContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No recorded delays in completed logs.</div>`;
+        } else {
+          const sortedReasons = Object.entries(delayCounts).sort((a, b) => b[1] - a[1]);
+          compositionContainer.innerHTML = sortedReasons.map(([reason, count]) => {
+            const pct = ((count / totalDelayedTrucks) * 100).toFixed(1);
+            return `
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-slate-700">${reason}</span>
+                  <span class="font-bold text-slate-500 text-[11px]">${count} (${pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                  <div class="bg-amber-500 h-2 rounded-full" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
 
       } catch (err) {
-        console.error("Error fetching averages:", err);
+        console.error("Error fetching analytics:", err);
       }
     }
 
