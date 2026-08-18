@@ -255,7 +255,7 @@
         const response = await fetch(`${SCRIPT_URL}?action=getActive`);
         const data = await response.json();
 
-        // Update Counts
+        // Update Volume Metrics
         document.getElementById('dailyTotal').innerText = data.counts.daily.total;
         document.getElementById('dailyCrate').innerText = data.counts.daily.crate;
         document.getElementById('dailyKeg').innerText = data.counts.daily.keg;
@@ -264,7 +264,9 @@
         document.getElementById('monthlyCrate').innerText = data.counts.monthly.crate;
         document.getElementById('monthlyKeg').innerText = data.counts.monthly.keg;
 
-        calculateDailyAvgTRT(data.activeTrucks || []);
+        // Directly set Daily Avg TRT computed by Apps Script backend
+        document.getElementById('avgResidenceTime').innerText = `${data.dailyAvgTRT || '0.0'} hrs`;
+
         renderDelayContribution(data.activeTrucks || []);
 
         activeQueueData = data.activeTrucks || [];
@@ -309,33 +311,6 @@
       }
     }
 
-    function calculateDailyAvgTRT(trucks) {
-      const now = new Date();
-      let totalHours = 0;
-      let count = 0;
-
-      trucks.forEach(t => {
-        if (t.gateIn && t.gateOut) {
-          const gateInTime = new Date(t.gateIn);
-          const gateOutTime = new Date(t.gateOut);
-
-          if (!isNaN(gateInTime.getTime()) && !isNaN(gateOutTime.getTime())) {
-            const isToday = gateOutTime.toDateString() === now.toDateString();
-            if (isToday) {
-              const diffHours = (gateOutTime - gateInTime) / (1000 * 60 * 60);
-              if (diffHours >= 0) {
-                totalHours += diffHours;
-                count++;
-              }
-            }
-          }
-        }
-      });
-
-      const avg = count > 0 ? (totalHours / count).toFixed(1) : '0.0';
-      document.getElementById('avgResidenceTime').innerText = `${avg} hrs`;
-    }
-
     function renderDelayContribution(trucks) {
       const container = document.getElementById('delayBreakdownContainer');
       const counts = {};
@@ -350,7 +325,7 @@
       });
 
       if (totalDelays === 0) {
-        container.innerHTML = `<p class="text-sm text-slate-500 italic">No delay reasons reported in the active queue.</p>`;
+        container.innerHTML = `<p class="text-sm text-slate-500 italic">No delay reasons reported in active queue.</p>`;
         return;
       }
 
