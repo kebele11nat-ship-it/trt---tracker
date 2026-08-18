@@ -60,7 +60,7 @@
 
     </div>
 
-    <!-- Entry Form Section (Primary Action) -->
+    <!-- Entry Form Section (Single Vertical Column Layout) -->
     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
         <h2 id="formHeader" class="text-lg font-bold text-slate-800">Log Truck Entry / Operational Update</h2>
@@ -68,113 +68,122 @@
       </div>
 
       <form id="trtForm" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">TRUCK NO *</label>
-            <input type="text" id="truckNo" required placeholder="e.g. AA-3-A12345" class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none uppercase font-mono">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">CARGO TYPE (ON ARRIVAL) *</label>
-            <select id="cargoType" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white font-semibold">
-              <option value="Crate">📦 Crate</option>
-              <option value="Keg">🍺 Keg</option>
-            </select>
-          </div>
+        
+        <!-- Truck No -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">TRUCK NO *</label>
+          <input type="text" id="truckNo" required placeholder="e.g. AA-3-A12345" class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none uppercase font-mono">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">DRIVER NAME</label>
-            <input type="text" id="driverName" placeholder="Driver name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">SO NUMBER</label>
-            <input type="text" id="soNo" placeholder="SO-XXXXX" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">AGENT NAME</label>
-            <input type="text" id="agentName" placeholder="Agent / Transport" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">OC NAME</label>
-            <select id="ocName" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
-              <option value="">Select OC</option>
-              <option value="Mihret">Mihret</option>
-              <option value="Misgana">Misgana</option>
-              <option value="Habtamu">Habtamu</option>
-              <option value="Tilahun">Tilahun</option>
-              <option value="Desalegn">Desalegn</option>
-              <option value="Emshaw">Emshaw</option>
-            </select>
-          </div>
+        <!-- Cargo Type -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">CARGO TYPE (ON ARRIVAL) *</label>
+          <select id="cargoType" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white font-semibold">
+            <option value="Crate">📦 Crate</option>
+            <option value="Keg">🍺 Keg</option>
+          </select>
+        </div>
+
+        <!-- Driver Name -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">DRIVER NAME</label>
+          <input type="text" id="driverName" placeholder="Driver name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+        </div>
+
+        <!-- SO Number -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">SO NUMBER</label>
+          <input type="text" id="soNo" placeholder="SO-XXXXX" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+        </div>
+
+        <!-- Agent Name -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">AGENT NAME</label>
+          <input type="text" id="agentName" placeholder="Agent / Transport" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+        </div>
+
+        <!-- OC Name -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">OC NAME</label>
+          <select id="ocName" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
+            <option value="">Select OC</option>
+            <option value="Mihret">Mihret</option>
+            <option value="Misgana">Misgana</option>
+            <option value="Habtamu">Habtamu</option>
+            <option value="Tilahun">Tilahun</option>
+            <option value="Desalegn">Desalegn</option>
+            <option value="Emshaw">Emshaw</option>
+          </select>
         </div>
 
         <hr class="border-slate-200">
 
-        <!-- Time Entries with "Set Now" Buttons -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="text-xs font-bold text-slate-600">GATE IN</label>
-              <button type="button" onclick="setNow('gateIn')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
-            </div>
-            <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+        <!-- Gate In -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-bold text-slate-600">GATE IN</label>
+            <button type="button" onclick="setNow('gateIn')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
           </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="text-xs font-bold text-slate-600">BAY IN</label>
-              <button type="button" onclick="setNow('bayIn')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
-            </div>
-            <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="text-xs font-bold text-slate-600">BAY OUT</label>
-              <button type="button" onclick="setNow('bayOut')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
-            </div>
-            <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-          </div>
-
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="text-xs font-bold text-slate-600">GATE OUT</label>
-              <button type="button" onclick="setNow('gateOut')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
-            </div>
-            <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-          </div>
+          <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-2 text-xs">
         </div>
 
+        <!-- Bay In -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-bold text-slate-600">BAY IN</label>
+            <button type="button" onclick="setNow('bayIn')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+          </div>
+          <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-2 text-xs">
+        </div>
+
+        <!-- Bay Out -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-bold text-slate-600">BAY OUT</label>
+            <button type="button" onclick="setNow('bayOut')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+          </div>
+          <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-2 text-xs">
+        </div>
+
+        <!-- Gate Out -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-xs font-bold text-slate-600">GATE OUT</label>
+            <button type="button" onclick="setNow('gateOut')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+          </div>
+          <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-2 text-xs">
+        </div>
+
+        <!-- Residence Calculations -->
         <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs flex justify-between font-mono">
           <div>Parking: <span id="dispParking" class="font-bold">-- hrs</span></div>
           <div>Loading: <span id="dispLoading" class="font-bold">-- hrs</span></div>
-          <div>Total Residence: <span id="dispTotal" class="font-bold text-amber-600">-- hrs</span></div>
+          <div>Total TRT: <span id="dispTotal" class="font-bold text-amber-600">-- hrs</span></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">DELAY REASON</label>
-            <select id="delayReason" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
-              <option value="">Select Delay Reason (if any)</option>
-              <option value="Product shortage">Product shortage</option>
-              <option value="manpower shortage">manpower shortage</option>
-              <option value="truck shortage">truck shortage</option>
-              <option value="bay congestion">bay congestion</option>
-              <option value="loading capacity">loading capacity</option>
-              <option value="forklift breakdown">forklift breakdown</option>
-              <option value="weather condition">weather condition</option>
-              <option value="FGS gate key">FGS gate key</option>
-              <option value="documentation delay">documentation delay</option>
-              <option value="pallet shortage">pallet shortage</option>
-              <option value="ERP malfunction">ERP malfunction</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">OC NOTES</label>
-            <input type="text" id="ocNotes" placeholder="Operational notes..." class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-          </div>
+        <!-- Delay Reason -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">DELAY REASON</label>
+          <select id="delayReason" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
+            <option value="">Select Delay Reason (if any)</option>
+            <option value="Product shortage">Product shortage</option>
+            <option value="manpower shortage">manpower shortage</option>
+            <option value="truck shortage">truck shortage</option>
+            <option value="bay congestion">bay congestion</option>
+            <option value="loading capacity">loading capacity</option>
+            <option value="forklift breakdown">forklift breakdown</option>
+            <option value="weather condition">weather condition</option>
+            <option value="FGS gate key">FGS gate key</option>
+            <option value="documentation delay">documentation delay</option>
+            <option value="pallet shortage">pallet shortage</option>
+            <option value="ERP malfunction">ERP malfunction</option>
+          </select>
+        </div>
+
+        <!-- OC Notes -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">OC NOTES</label>
+          <input type="text" id="ocNotes" placeholder="Operational notes..." class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
         </div>
 
         <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg text-sm shadow transition">
@@ -185,7 +194,7 @@
       </form>
     </div>
 
-    <!-- Active Queue & Secondary Operational Analytics (Moved to Bottom) -->
+    <!-- Active Queue & Secondary Operational Analytics (Bottom Sections) -->
     <div class="space-y-6">
 
       <!-- Active Terminal Queue -->
@@ -220,7 +229,7 @@
         </div>
       </div>
 
-      <!-- Performance Averages & Monthly Delay Share Side-by-Side (Bottom Section) -->
+      <!-- Performance Averages & Monthly Delay Share Side-by-Side -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Performance Averages (2 Columns) -->
