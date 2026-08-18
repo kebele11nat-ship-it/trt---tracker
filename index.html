@@ -21,8 +21,8 @@
       </button>
     </div>
 
-    <!-- Executive Volume & Performance Analytics Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Executive Volume Summary Cards (Top Priority) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       
       <!-- Daily Volume Card -->
       <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
@@ -58,193 +58,221 @@
         </div>
       </div>
 
-      <!-- Daily TRT & Bay Time Averages -->
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-        <span class="text-xs font-bold uppercase text-slate-400 block tracking-wider">Daily Time Averages</span>
-        <div class="space-y-1.5 pt-1">
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">TRT Avg:</span>
-            <span class="font-bold text-amber-600"><span id="avgDailyTRT">--</span> hrs</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">Bay Time Avg:</span>
-            <span class="font-bold text-blue-600"><span id="avgDailyBay">--</span> hrs</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Monthly TRT & Bay Time Averages -->
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
-        <span class="text-xs font-bold uppercase text-slate-400 block tracking-wider">Monthly Time Averages (30D)</span>
-        <div class="space-y-1.5 pt-1">
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">TRT Avg:</span>
-            <span class="font-bold text-amber-600"><span id="avgMonthlyTRT">--</span> hrs</span>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-600">Bay Time Avg:</span>
-            <span class="font-bold text-blue-600"><span id="avgMonthlyBay">--</span> hrs</span>
-          </div>
-        </div>
-      </div>
-
     </div>
 
-    <!-- Form Section & Delay Chart Breakdown -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <!-- Truck Entry Form -->
-      <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
-          <h2 id="formHeader" class="text-lg font-bold text-slate-800">Log Truck Entry / Operational Update</h2>
-          <button type="button" onclick="clearForm()" class="text-xs text-slate-500 hover:text-slate-800 underline">Reset Form</button>
-        </div>
-
-        <form id="trtForm" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">TRUCK NO *</label>
-              <input type="text" id="truckNo" required placeholder="e.g. AA-3-A12345" class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none uppercase font-mono">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">CARGO TYPE (ON ARRIVAL) *</label>
-              <select id="cargoType" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white font-semibold">
-                <option value="Crate">📦 Crate</option>
-                <option value="Keg">🍺 Keg</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">DRIVER NAME</label>
-              <input type="text" id="driverName" placeholder="Driver name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">SO NUMBER</label>
-              <input type="text" id="soNo" placeholder="SO-XXXXX" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">AGENT NAME</label>
-              <input type="text" id="agentName" placeholder="Agent / Transport" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">OC NAME</label>
-              <select id="ocName" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
-                <option value="">Select OC</option>
-                <option value="Mihret">Mihret</option>
-                <option value="Misgana">Misgana</option>
-                <option value="Habtamu">Habtamu</option>
-                <option value="Tilahun">Tilahun</option>
-                <option value="Desalegn">Desalegn</option>
-                <option value="Emshaw">Emshaw</option>
-              </select>
-            </div>
-          </div>
-
-          <hr class="border-slate-200">
-
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">GATE IN</label>
-              <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">BAY IN</label>
-              <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">BAY OUT</label>
-              <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">GATE OUT</label>
-              <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-          </div>
-
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs flex justify-between font-mono">
-            <div>Parking: <span id="dispParking" class="font-bold">-- hrs</span></div>
-            <div>Loading: <span id="dispLoading" class="font-bold">-- hrs</span></div>
-            <div>Total Residence: <span id="dispTotal" class="font-bold text-amber-600">-- hrs</span></div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">DELAY REASON</label>
-              <select id="delayReason" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
-                <option value="">Select Delay Reason (if any)</option>
-                <option value="Product shortage">Product shortage</option>
-                <option value="manpower shortage">manpower shortage</option>
-                <option value="truck shortage">truck shortage</option>
-                <option value="bay congestion">bay congestion</option>
-                <option value="loading capacity">loading capacity</option>
-                <option value="forklift breakdown">forklift breakdown</option>
-                <option value="weather condition">weather condition</option>
-                <option value="FGS gate key">FGS gate key</option>
-                <option value="documentation delay">documentation delay</option>
-                <option value="pallet shortage">pallet shortage</option>
-                <option value="ERP malfunction">ERP malfunction</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">OC NOTES</label>
-              <input type="text" id="ocNotes" placeholder="Operational notes..." class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
-          </div>
-
-          <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg text-sm shadow transition">
-            💾 Save & Sync Record
-          </button>
-
-          <div id="statusMsg" class="hidden p-3 text-center rounded-lg font-bold text-sm"></div>
-        </form>
-      </div>
-
-      <!-- Chart & Delay Breakdown -->
-      <div class="lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 flex flex-col">
-        <h2 class="text-base font-bold text-slate-800 border-b pb-2">📊 Monthly Delay Breakdown (%)</h2>
-        <div class="relative w-full h-56 flex items-center justify-center">
-          <canvas id="delayChart"></canvas>
-        </div>
-        <div id="delayBreakdownList" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs pt-2 border-t border-slate-100">
-          <p class="text-slate-400">Loading delay metrics...</p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Active Terminal Queue (Moved to Bottom) -->
+    <!-- Entry Form Section (Primary Action) -->
     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
-        <div>
-          <h2 class="text-lg font-bold text-slate-800">Active Terminal Queue (Inside Yard)</h2>
-          <p class="text-xs text-slate-400">Trucks currently undergoing parking or bay loading</p>
-        </div>
-        <span class="text-xs bg-amber-100 text-amber-800 font-bold px-3 py-1 rounded-full" id="activeBadge">0 Active</span>
+        <h2 id="formHeader" class="text-lg font-bold text-slate-800">Log Truck Entry / Operational Update</h2>
+        <button type="button" onclick="clearForm()" class="text-xs text-slate-500 hover:text-slate-800 underline">Reset Form</button>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b">
-            <tr>
-              <th class="p-3">Truck No</th>
-              <th class="p-3">Cargo Type</th>
-              <th class="p-3">SO No</th>
-              <th class="p-3">OC Name</th>
-              <th class="p-3">Gate In</th>
-              <th class="p-3">Status</th>
-              <th class="p-3 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody id="activeTableBody" class="divide-y divide-slate-100">
-            <tr>
-              <td colspan="7" class="text-center p-6 text-slate-400">Loading active yard queue...</td>
-            </tr>
-          </tbody>
-        </table>
+      <form id="trtForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">TRUCK NO *</label>
+            <input type="text" id="truckNo" required placeholder="e.g. AA-3-A12345" class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none uppercase font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">CARGO TYPE (ON ARRIVAL) *</label>
+            <select id="cargoType" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white font-semibold">
+              <option value="Crate">📦 Crate</option>
+              <option value="Keg">🍺 Keg</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">DRIVER NAME</label>
+            <input type="text" id="driverName" placeholder="Driver name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">SO NUMBER</label>
+            <input type="text" id="soNo" placeholder="SO-XXXXX" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">AGENT NAME</label>
+            <input type="text" id="agentName" placeholder="Agent / Transport" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">OC NAME</label>
+            <select id="ocName" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
+              <option value="">Select OC</option>
+              <option value="Mihret">Mihret</option>
+              <option value="Misgana">Misgana</option>
+              <option value="Habtamu">Habtamu</option>
+              <option value="Tilahun">Tilahun</option>
+              <option value="Desalegn">Desalegn</option>
+              <option value="Emshaw">Emshaw</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="border-slate-200">
+
+        <!-- Time Entries with "Set Now" Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-bold text-slate-600">GATE IN</label>
+              <button type="button" onclick="setNow('gateIn')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+            </div>
+            <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-bold text-slate-600">BAY IN</label>
+              <button type="button" onclick="setNow('bayIn')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+            </div>
+            <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-bold text-slate-600">BAY OUT</label>
+              <button type="button" onclick="setNow('bayOut')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+            </div>
+            <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-xs font-bold text-slate-600">GATE OUT</label>
+              <button type="button" onclick="setNow('gateOut')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded transition">⏱️ Now</button>
+            </div>
+            <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs flex justify-between font-mono">
+          <div>Parking: <span id="dispParking" class="font-bold">-- hrs</span></div>
+          <div>Loading: <span id="dispLoading" class="font-bold">-- hrs</span></div>
+          <div>Total Residence: <span id="dispTotal" class="font-bold text-amber-600">-- hrs</span></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">DELAY REASON</label>
+            <select id="delayReason" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
+              <option value="">Select Delay Reason (if any)</option>
+              <option value="Product shortage">Product shortage</option>
+              <option value="manpower shortage">manpower shortage</option>
+              <option value="truck shortage">truck shortage</option>
+              <option value="bay congestion">bay congestion</option>
+              <option value="loading capacity">loading capacity</option>
+              <option value="forklift breakdown">forklift breakdown</option>
+              <option value="weather condition">weather condition</option>
+              <option value="FGS gate key">FGS gate key</option>
+              <option value="documentation delay">documentation delay</option>
+              <option value="pallet shortage">pallet shortage</option>
+              <option value="ERP malfunction">ERP malfunction</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">OC NOTES</label>
+            <input type="text" id="ocNotes" placeholder="Operational notes..." class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+          </div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-lg text-sm shadow transition">
+          💾 Save & Sync Record
+        </button>
+
+        <div id="statusMsg" class="hidden p-3 text-center rounded-lg font-bold text-sm"></div>
+      </form>
+    </div>
+
+    <!-- Active Queue & Secondary Operational Analytics (Moved to Bottom) -->
+    <div class="space-y-6">
+
+      <!-- Active Terminal Queue -->
+      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">Active Terminal Queue (Inside Yard)</h2>
+            <p class="text-xs text-slate-400">Trucks currently undergoing parking or bay loading</p>
+          </div>
+          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-3 py-1 rounded-full" id="activeBadge">0 Active</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b">
+              <tr>
+                <th class="p-3">Truck No</th>
+                <th class="p-3">Cargo Type</th>
+                <th class="p-3">SO No</th>
+                <th class="p-3">OC Name</th>
+                <th class="p-3">Gate In</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="activeTableBody" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="7" class="text-center p-6 text-slate-400">Loading active yard queue...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
+      <!-- Performance Averages & Monthly Delay Share Side-by-Side (Bottom Section) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Performance Averages (2 Columns) -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+          <h2 class="text-base font-bold text-slate-800 border-b pb-2">⏱️ Performance Averages (Hours)</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+              <span class="text-xs font-bold uppercase text-slate-500">Daily Average</span>
+              <div class="mt-2 space-y-1">
+                <p class="text-sm text-slate-600">TRT: <span id="avgDailyTRT" class="font-bold text-amber-600">--</span> hrs</p>
+                <p class="text-sm text-slate-600">Bay Time: <span id="avgDailyBay" class="font-bold text-blue-600">--</span> hrs</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+              <span class="text-xs font-bold uppercase text-slate-500">Weekly Average (7D)</span>
+              <div class="mt-2 space-y-1">
+                <p class="text-sm text-slate-600">TRT: <span id="avgWeeklyTRT" class="font-bold text-amber-600">--</span> hrs</p>
+                <p class="text-sm text-slate-600">Bay Time: <span id="avgWeeklyBay" class="font-bold text-blue-600">--</span> hrs</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+              <span class="text-xs font-bold uppercase text-slate-500">Monthly Average (30D)</span>
+              <div class="mt-2 space-y-1">
+                <p class="text-sm text-slate-600">TRT: <span id="avgMonthlyTRT" class="font-bold text-amber-600">--</span> hrs</p>
+                <p class="text-sm text-slate-600">Bay Time: <span id="avgMonthlyBay" class="font-bold text-blue-600">--</span> hrs</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Text Delay Breakdown Summary List -->
+          <div class="mt-4 pt-4 border-t border-slate-100">
+            <span class="text-xs font-bold uppercase text-slate-500 mb-2 block">Monthly Delay Summary</span>
+            <div id="delayBreakdownList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <p class="text-slate-400">Loading delay statistics...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Delay Chart (1 Column) -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3 flex flex-col items-center justify-center">
+          <h2 class="text-base font-bold text-slate-800 border-b pb-2 w-full text-left">📊 Monthly Delay Share (%)</h2>
+          <div class="relative w-full h-64 flex items-center justify-center">
+            <canvas id="delayChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
@@ -258,6 +286,14 @@
       '#F59E0B', '#3B82F6', '#EF4444', '#10B981', '#8B5CF6',
       '#EC4899', '#6366F1', '#14B8A6', '#F97316', '#06B6D4', '#84CC16'
     ];
+
+    function setNow(inputId) {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const formatted = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      document.getElementById(inputId).value = formatted;
+      calculateMetrics();
+    }
 
     function formatDateForInput(dtStr) {
       if (!dtStr) return "";
@@ -342,7 +378,7 @@
         activeTrucksData = data.activeTrucks || [];
         document.getElementById('activeBadge').innerText = `${activeTrucksData.length} Active`;
 
-        // Render Volume Counts
+        // Volume Counts
         if (data.counts) {
           document.getElementById('cntDailyTotal').innerText = data.counts.daily.total;
           document.getElementById('cntDailyCrate').innerText = data.counts.daily.crate;
@@ -353,19 +389,21 @@
           document.getElementById('cntMonthlyKeg').innerText = data.counts.monthly.keg;
         }
 
-        // Render Performance Averages
+        // Performance Averages
         if (data.averages) {
           document.getElementById('avgDailyTRT').innerText = data.averages.daily.trt;
           document.getElementById('avgDailyBay').innerText = data.averages.daily.bay;
+          document.getElementById('avgWeeklyTRT').innerText = data.averages.weekly.trt;
+          document.getElementById('avgWeeklyBay').innerText = data.averages.weekly.bay;
           document.getElementById('avgMonthlyTRT').innerText = data.averages.monthly.trt;
           document.getElementById('avgMonthlyBay').innerText = data.averages.monthly.bay;
         }
 
-        // Render Monthly Delay Breakdown
+        // Monthly Delay Breakdown
         const delayContainer = document.getElementById('delayBreakdownList');
         if (data.monthlyDelays && data.monthlyDelays.length > 0) {
           delayContainer.innerHTML = data.monthlyDelays.map(d => `
-            <div class="flex justify-between items-center bg-slate-50 p-1.5 rounded border border-slate-100">
+            <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
               <span class="font-medium text-slate-700 capitalize truncate">${d.reason}</span>
               <span class="font-bold text-slate-900 ml-1">${d.percentage}% (${d.count})</span>
             </div>
