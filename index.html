@@ -6,11 +6,9 @@
   <title>TRT Residence Time Tracker - Hawasa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-  </style>
+  <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8 selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQQzuTdknhYrhpkjSm0IRmEMCBmm-pkr03UTKwpYwl_mKfBA9DJ3iXY44L-Wmtpgxk/exec';
@@ -18,32 +16,27 @@
 
   <div class="max-w-7xl mx-auto space-y-8">
     
-    <!-- Navigation / Header -->
-    <header class="bg-slate-800/80 backdrop-blur-md p-6 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <!-- Header -->
+    <header class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/60 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div class="flex items-center gap-4">
-        <div class="h-12 w-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-xl font-black shadow-lg shadow-indigo-500/30">
-          🚛
-        </div>
+        <div class="h-12 w-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-xl font-black shadow-lg">🚛</div>
         <div>
           <h1 class="text-2xl font-black tracking-tight text-white">TRT Residence Time Tracker</h1>
           <p class="text-xs font-semibold text-indigo-400">Hawasa Terminal & Yard Operations</p>
         </div>
       </div>
-      <button onclick="refreshData()" class="w-full md:w-auto px-5 py-2.5 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white rounded-xl text-xs font-bold tracking-wide transition-all duration-200 border border-slate-600 shadow-md flex items-center justify-center gap-2">
-        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        Refresh Terminal Queue
+      <button onclick="refreshData()" class="w-full md:w-auto px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition shadow border border-slate-600 flex items-center justify-center gap-2">
+        ↻ Refresh Terminal Queue
       </button>
     </header>
 
-    <!-- Analytics Dashboard Cards -->
+    <!-- Top Indicators -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
       
-      <!-- Card 1 -->
-      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg relative overflow-hidden group hover:border-slate-600 transition">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition"></div>
-        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3">Today's Gate In Volume</h3>
+      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg">
+        <h3 class="text-xs font-extrabold text-slate-400 uppercase mb-3">Today's Gate In Volume</h3>
         <div class="flex justify-between items-end">
-          <span id="dailyTotal" class="text-4xl font-black text-white tracking-tight">0</span>
+          <span id="dailyTotal" class="text-4xl font-black text-white">0</span>
           <div class="space-x-2 text-xs font-bold">
             <span class="bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-lg">Crate: <span id="dailyCrate">0</span></span>
             <span class="bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-lg">Keg: <span id="dailyKeg">0</span></span>
@@ -51,12 +44,10 @@
         </div>
       </div>
 
-      <!-- Card 2 -->
-      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg relative overflow-hidden group hover:border-slate-600 transition">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition"></div>
-        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3">30-Day Total Throughput</h3>
+      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg">
+        <h3 class="text-xs font-extrabold text-slate-400 uppercase mb-3">30-Day Total Throughput</h3>
         <div class="flex justify-between items-end">
-          <span id="monthlyTotal" class="text-4xl font-black text-white tracking-tight">0</span>
+          <span id="monthlyTotal" class="text-4xl font-black text-white">0</span>
           <div class="space-x-2 text-xs font-bold">
             <span class="bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 px-2.5 py-1 rounded-lg">Crate: <span id="monthlyCrate">0</span></span>
             <span class="bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-lg">Keg: <span id="monthlyKeg">0</span></span>
@@ -64,12 +55,11 @@
         </div>
       </div>
 
-      <!-- Card 3 -->
-      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg relative overflow-hidden group hover:border-slate-600 transition">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition"></div>
-        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3">Daily Avg TRT</h3>
+      <!-- DAILY AVG TRT TOP INDICATOR -->
+      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg relative overflow-hidden">
+        <h3 class="text-xs font-extrabold text-slate-400 uppercase mb-3">Daily Avg TRT</h3>
         <div class="flex justify-between items-end">
-          <span id="avgResidenceTime" class="text-4xl font-black text-emerald-400 tracking-tight">0.0 hrs</span>
+          <span id="avgResidenceTime" class="text-4xl font-black text-emerald-400">0.0 hrs</span>
           <span class="text-[11px] font-bold text-slate-400 bg-slate-700/50 px-2 py-1 rounded-md">Gate Out - Gate In</span>
         </div>
       </div>
@@ -78,12 +68,12 @@
 
     <!-- Active Queue Section -->
     <section class="bg-slate-800/80 rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
-      <div class="p-6 border-b border-slate-700/60 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40">
+      <div class="p-6 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
         <div>
-          <h2 class="text-lg font-bold text-white tracking-tight">Active Terminal Queue</h2>
-          <p class="text-xs text-slate-400">Trucks currently inside the Hawasa yard boundary</p>
+          <h2 class="text-lg font-bold text-white">Active Terminal Queue</h2>
+          <p class="text-xs text-slate-400">Trucks inside Hawasa yard boundary (<span class="text-rose-400 font-bold">>3.0 hrs highlighted in red</span>)</p>
         </div>
-        <span id="activeBadge" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-extrabold px-3.5 py-1.5 rounded-full shadow-inner">
+        <span id="activeBadge" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-extrabold px-3.5 py-1.5 rounded-full">
           0 Active
         </span>
       </div>
@@ -95,6 +85,7 @@
               <th class="py-4 px-5 font-bold">Truck No</th>
               <th class="py-4 px-5 font-bold">Action</th>
               <th class="py-4 px-5 font-bold">Status</th>
+              <th class="py-4 px-5 font-bold">Dwell Time</th>
               <th class="py-4 px-5 font-bold">Cargo</th>
               <th class="py-4 px-5 font-bold">SO No</th>
               <th class="py-4 px-5 font-bold">OC Name</th>
@@ -103,7 +94,7 @@
           </thead>
           <tbody id="queueTableBody" class="divide-y divide-slate-700/40 font-medium">
             <tr>
-              <td colspan="7" class="text-center py-10 text-slate-500 italic">Loading active yard queue...</td>
+              <td colspan="8" class="text-center py-10 text-slate-500 italic">Loading active yard queue...</td>
             </tr>
           </tbody>
         </table>
@@ -114,42 +105,41 @@
     <section class="bg-slate-800/80 p-6 md:p-8 rounded-2xl shadow-xl border border-slate-700/60">
       <div class="flex items-center gap-3 border-b border-slate-700/60 pb-4 mb-6">
         <div class="w-2.5 h-6 bg-indigo-500 rounded-full"></div>
-        <h2 class="text-lg font-bold text-white tracking-tight">Log / Update Fleet Record</h2>
+        <h2 class="text-lg font-bold text-white">Log / Update Fleet Record</h2>
       </div>
 
       <form id="trtForm" class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Truck Plate No *</label>
-          <input type="text" id="truckNo" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold uppercase text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">Truck Plate No *</label>
+          <input type="text" id="truckNo" required class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold uppercase text-sm focus:border-indigo-500 outline-none">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Cargo Type</label>
-          <select id="cargoType" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">Cargo Type</label>
+          <select id="cargoType" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 outline-none">
             <option value="Crate">Crate</option>
             <option value="Keg">Keg</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Driver Name</label>
-          <input type="text" id="driverName" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">Driver Name</label>
+          <input type="text" id="driverName" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm outline-none">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">SO Number</label>
-          <input type="text" id="soNo" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">SO Number</label>
+          <input type="text" id="soNo" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm outline-none">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Agent Name</label>
-          <input type="text" id="agentName" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">Agent Name</label>
+          <input type="text" id="agentName" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm outline-none">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">OC Name</label>
-          <select id="ocName" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">OC Name</label>
+          <select id="ocName" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm outline-none">
             <option value="">-- Select Controller --</option>
             <option value="Misgana">Misgana</option>
             <option value="Habtamu">Habtamu</option>
@@ -157,46 +147,44 @@
             <option value="Desalegn">Desalegn</option>
             <option value="Mihret">Mihret</option>
             <option value="Emshaw">Emshaw</option>
-            <option value="Other">Other / Custom</option>
           </select>
         </div>
 
-        <!-- Timestamps with Set Now -->
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Gate In</label>
-            <button type="button" onclick="setNow('gateIn')" class="text-[10px] font-extrabold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg transition active:scale-95">SET NOW</button>
+            <label class="block text-xs font-bold text-slate-300 uppercase">Gate In</label>
+            <button type="button" onclick="setNow('gateIn')" class="text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">SET NOW</button>
           </div>
-          <input type="datetime-local" id="gateIn" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition color-scheme-dark">
+          <input type="datetime-local" id="gateIn" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Bay In</label>
-            <button type="button" onclick="setNow('bayIn')" class="text-[10px] font-extrabold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg transition active:scale-95">SET NOW</button>
+            <label class="block text-xs font-bold text-slate-300 uppercase">Bay In</label>
+            <button type="button" onclick="setNow('bayIn')" class="text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">SET NOW</button>
           </div>
-          <input type="datetime-local" id="bayIn" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition color-scheme-dark">
+          <input type="datetime-local" id="bayIn" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Bay Out</label>
-            <button type="button" onclick="setNow('bayOut')" class="text-[10px] font-extrabold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg transition active:scale-95">SET NOW</button>
+            <label class="block text-xs font-bold text-slate-300 uppercase">Bay Out</label>
+            <button type="button" onclick="setNow('bayOut')" class="text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">SET NOW</button>
           </div>
-          <input type="datetime-local" id="bayOut" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition color-scheme-dark">
+          <input type="datetime-local" id="bayOut" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Gate Out</label>
-            <button type="button" onclick="setNow('gateOut')" class="text-[10px] font-extrabold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-lg transition active:scale-95">SET NOW</button>
+            <label class="block text-xs font-bold text-slate-300 uppercase">Gate Out</label>
+            <button type="button" onclick="setNow('gateOut')" class="text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">SET NOW</button>
           </div>
-          <input type="datetime-local" id="gateOut" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition color-scheme-dark">
+          <input type="datetime-local" id="gateOut" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Delay Reason</label>
-          <select id="delayReason" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">Delay Reason</label>
+          <select id="delayReason" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
             <option value="">-- None / Select Reason --</option>
             <option value="Space Constraints">Space Constraints</option>
             <option value="Unloading Delay">Unloading Delay</option>
@@ -209,30 +197,30 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">OC Notes</label>
-          <input type="text" id="ocNotes" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-2">OC Notes</label>
+          <input type="text" id="ocNotes" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
         </div>
 
         <div class="md:col-span-3 flex justify-end gap-3 mt-4">
-          <button type="button" onclick="clearForm()" class="px-6 py-3 border border-slate-700 text-slate-300 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-slate-700/50 transition">Clear Form</button>
-          <button type="submit" id="submitBtn" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition active:scale-95">💾 Save & Sync Record</button>
+          <button type="button" onclick="clearForm()" class="px-6 py-3 border border-slate-700 text-slate-300 font-bold rounded-xl text-xs uppercase">Clear Form</button>
+          <button type="submit" id="submitBtn" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold rounded-xl text-xs uppercase shadow-lg">💾 Save & Sync Record</button>
         </div>
       </form>
       <div id="statusMsg" class="hidden"></div>
     </section>
 
-    <!-- Delay Contribution Section -->
+    <!-- DELAY REASON CONTRIBUTION AT BOTTOM -->
     <section class="bg-slate-800/80 p-6 md:p-8 rounded-2xl shadow-xl border border-slate-700/60">
       <div class="flex items-center gap-3 border-b border-slate-700/60 pb-4 mb-6">
         <div class="w-2.5 h-6 bg-amber-500 rounded-full"></div>
         <div>
-          <h2 class="text-lg font-bold text-white tracking-tight">Delay Reason Contribution</h2>
-          <p class="text-xs text-slate-400">Proportional breakdown of delay factors in the active terminal queue</p>
+          <h2 class="text-lg font-bold text-white">Delay Reason Contribution</h2>
+          <p class="text-xs text-slate-400">Proportional percentage breakdown of active delay factors</p>
         </div>
       </div>
 
       <div id="delayBreakdownContainer" class="space-y-4">
-        <p class="text-sm text-slate-500 italic">No delay reasons reported in active queue.</p>
+        <p class="text-sm text-slate-500 italic">No active delay reasons reported.</p>
       </div>
     </section>
 
@@ -249,31 +237,33 @@
 
     async function refreshData() {
       const tbody = document.getElementById('queueTableBody');
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-500 italic">Loading active yard queue...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-slate-500 italic">Syncing with TRT_Master_Database...</td></tr>`;
 
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getActive`);
         const data = await response.json();
 
-        // Update Volume Metrics
-        document.getElementById('dailyTotal').innerText = data.counts.daily.total;
-        document.getElementById('dailyCrate').innerText = data.counts.daily.crate;
-        document.getElementById('dailyKeg').innerText = data.counts.daily.keg;
+        // Update Volumes
+        if (data.counts) {
+          document.getElementById('dailyTotal').innerText = data.counts.daily.total || 0;
+          document.getElementById('dailyCrate').innerText = data.counts.daily.crate || 0;
+          document.getElementById('dailyKeg').innerText = data.counts.daily.keg || 0;
 
-        document.getElementById('monthlyTotal').innerText = data.counts.monthly.total;
-        document.getElementById('monthlyCrate').innerText = data.counts.monthly.crate;
-        document.getElementById('monthlyKeg').innerText = data.counts.monthly.keg;
+          document.getElementById('monthlyTotal').innerText = data.counts.monthly.total || 0;
+          document.getElementById('monthlyCrate').innerText = data.counts.monthly.crate || 0;
+          document.getElementById('monthlyKeg').innerText = data.counts.monthly.keg || 0;
+        }
 
-        // Directly set Daily Avg TRT computed by Apps Script backend
+        // Top Avg TRT Indicator
         document.getElementById('avgResidenceTime').innerText = `${data.dailyAvgTRT || '0.0'} hrs`;
-
-        renderDelayContribution(data.activeTrucks || []);
 
         activeQueueData = data.activeTrucks || [];
         document.getElementById('activeBadge').innerText = `${activeQueueData.length} Active`;
 
+        renderDelayContribution(activeQueueData);
+
         if (activeQueueData.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-500 font-medium">No active trucks inside the yard</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-slate-500 font-medium">No active trucks inside the yard</td></tr>`;
           return;
         }
 
@@ -289,6 +279,12 @@
             statusStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
           }
 
+          // DWELL TIME & COLOR CODING (>3 Hours = Red Alert)
+          const isOver3Hours = item.dwellHours > 3.0;
+          const dwellStyle = isOver3Hours 
+            ? "bg-rose-500/20 text-rose-300 border-rose-500/40 font-black animate-pulse" 
+            : "bg-slate-700/50 text-slate-300 border-slate-600";
+
           const formattedGateIn = item.gateIn ? new Date(item.gateIn).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '-';
 
           return `
@@ -298,6 +294,11 @@
                 <button onclick="editTruck(${index})" class="px-3 py-1.5 bg-slate-700 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition shadow">Edit / Checkout</button>
               </td>
               <td class="py-4 px-5"><span class="px-3 py-1 text-[11px] font-extrabold rounded-full border ${statusStyle}">${statusText}</span></td>
+              <td class="py-4 px-5">
+                <span class="px-3 py-1 text-xs rounded-lg border ${dwellStyle}">
+                  ${item.dwellHours || '0.0'} hrs ${isOver3Hours ? '⚠️ EXCEEDED' : ''}
+                </span>
+              </td>
               <td class="py-4 px-5">${item.cargoType}</td>
               <td class="py-4 px-5 text-slate-400">${item.soNo || '-'}</td>
               <td class="py-4 px-5 text-slate-300">${item.ocName || '-'}</td>
@@ -307,7 +308,7 @@
         }).join('');
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-rose-400 font-semibold">Failed to fetch data from TRT_Master_Database</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-rose-400 font-semibold">Error connecting to database. Please re-deploy Google Apps Script as a NEW VERSION.</td></tr>`;
       }
     }
 
@@ -336,8 +337,8 @@
         return `
           <div>
             <div class="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
-              <span>${reason} (${count})</span>
-              <span class="text-amber-400">${pct}%</span>
+              <span>${reason} (${count} Trucks)</span>
+              <span class="text-amber-400">${pct}% Contribution</span>
             </div>
             <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700">
               <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
@@ -378,15 +379,13 @@
       document.getElementById('trtForm').reset();
     }
 
-    // FORM SUBMIT HANDLER
     document.getElementById('trtForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
       const msg = document.getElementById('statusMsg');
       
       btn.disabled = true;
-      btn.innerText = 'Syncing to TRT_Master_Database...';
-      msg.className = 'hidden';
+      btn.innerText = 'Syncing...';
 
       const formData = new URLSearchParams();
       formData.append('truckNo', document.getElementById('truckNo').value);
@@ -410,15 +409,15 @@
           body: formData.toString()
         });
 
-        msg.innerText = '✓ Record saved and synced to TRT_Master_Database!';
-        msg.className = 'p-4 mt-6 text-center rounded-xl font-bold text-sm bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 shadow-lg';
+        msg.innerText = '✓ Saved to TRT_Master_Database!';
+        msg.className = 'p-4 mt-6 text-center rounded-xl font-bold text-sm bg-emerald-500/10 text-emerald-300 border border-emerald-500/30';
         
         clearForm();
         setTimeout(refreshData, 1500);
 
       } catch (err) {
-        msg.innerText = '❌ Error updating database: ' + err.message;
-        msg.className = 'p-4 mt-6 text-center rounded-lg font-bold text-sm bg-rose-500/10 text-rose-300 border border-rose-500/30 shadow-lg';
+        msg.innerText = '❌ Error saving: ' + err.message;
+        msg.className = 'p-4 mt-6 text-center rounded-lg font-bold text-sm bg-rose-500/10 text-rose-300 border border-rose-500/30';
       } finally {
         msg.classList.remove('hidden');
         btn.disabled = false;
@@ -426,7 +425,6 @@
       }
     });
 
-    // Initial Execution
     refreshData();
   </script>
 </body>
