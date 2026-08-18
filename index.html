@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <title>BGI Hawasa - TRT Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans p-4 md:p-8">
 
   <div class="max-w-7xl mx-auto space-y-6">
     
-    <!-- Top Bar Header -->
+    <!-- Header -->
     <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-center gap-4">
       <div>
         <h1 class="text-2xl font-black tracking-wide text-amber-400">BGI HAWASA YARD MANAGEMENT</h1>
@@ -20,50 +22,63 @@
       </button>
     </div>
 
-    <!-- Active Count & Completed Performance Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-bold text-slate-500 uppercase">Active In Yard</p>
-        <p id="statTotalTrucks" class="text-3xl font-black text-slate-800 mt-1">0</p>
-        <span class="text-xs text-slate-400">Currently Open</span>
-      </div>
+    <!-- Performance Analytics Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Average Times (Daily, Weekly, Monthly) -->
+      <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 flex flex-col justify-between">
+        <h2 class="text-base font-bold text-slate-800 border-b pb-2">⏱️ Performance Averages (Hours)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+            <span class="text-xs font-bold uppercase text-slate-500">Daily Average</span>
+            <div class="mt-2 space-y-1">
+              <p class="text-sm text-slate-600">TRT: <span id="avgDailyTRT" class="font-bold text-amber-600">--</span> hrs</p>
+              <p class="text-sm text-slate-600">Bay Time: <span id="avgDailyBay" class="font-bold text-blue-600">--</span> hrs</p>
+            </div>
+          </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
-        <p class="text-xs font-bold text-slate-500 uppercase">Active Crates / Kegs</p>
-        <div class="flex items-baseline space-x-2 mt-1">
-          <span id="statActiveCrate" class="text-2xl font-black text-blue-600">0</span><span class="text-xs text-slate-400">Crate</span>
-          <span class="text-slate-300">|</span>
-          <span id="statActiveKeg" class="text-2xl font-black text-emerald-600">0</span><span class="text-xs text-slate-400">Keg</span>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+            <span class="text-xs font-bold uppercase text-slate-500">Weekly Average (7D)</span>
+            <div class="mt-2 space-y-1">
+              <p class="text-sm text-slate-600">TRT: <span id="avgWeeklyTRT" class="font-bold text-amber-600">--</span> hrs</p>
+              <p class="text-sm text-slate-600">Bay Time: <span id="avgWeeklyBay" class="font-bold text-blue-600">--</span> hrs</p>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+            <span class="text-xs font-bold uppercase text-slate-500">Monthly Average (30D)</span>
+            <div class="mt-2 space-y-1">
+              <p class="text-sm text-slate-600">TRT: <span id="avgMonthlyTRT" class="font-bold text-amber-600">--</span> hrs</p>
+              <p class="text-sm text-slate-600">Bay Time: <span id="avgMonthlyBay" class="font-bold text-blue-600">--</span> hrs</p>
+            </div>
+          </div>
+
         </div>
-        <span class="text-xs text-slate-400">Active Cargo Split</span>
-      </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-indigo-500">
-        <p class="text-xs font-bold text-slate-500 uppercase">Completed Total</p>
-        <p id="statTotalCompleted" class="text-3xl font-black text-indigo-600 mt-1">0</p>
-        <span class="text-xs text-slate-400">Total Departed</span>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
-        <p class="text-xs font-bold text-slate-500 uppercase">Completed Breakdown</p>
-        <div class="flex items-baseline space-x-2 mt-1">
-          <span id="statCompCrate" class="text-2xl font-black text-blue-600">0</span><span class="text-xs text-slate-400">Crate</span>
-          <span class="text-slate-300">|</span>
-          <span id="statCompKeg" class="text-2xl font-black text-emerald-600">0</span><span class="text-xs text-slate-400">Keg</span>
+        <!-- Delay Breakdown Text Summary List -->
+        <div class="mt-4 pt-4 border-t border-slate-100">
+          <span class="text-xs font-bold uppercase text-slate-500 mb-2 block">Monthly Delay Summary</span>
+          <div id="delayBreakdownList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+            <p class="text-slate-400">Loading delay statistics...</p>
+          </div>
         </div>
-        <span class="text-xs text-slate-400">Departed Cargo Split</span>
       </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-bold text-slate-500 uppercase">Avg Active Residence</p>
-        <p id="statAvgResidence" class="text-3xl font-black text-amber-600 mt-1">-- hrs</p>
-        <span class="text-xs text-slate-400">Live Yard Duration</span>
+      <!-- Monthly Delay Pie Chart Visualization -->
+      <div class="lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3 flex flex-col items-center justify-center">
+        <h2 class="text-base font-bold text-slate-800 border-b pb-2 w-full text-left">📊 Monthly Delay Share (%)</h2>
+        <div class="relative w-full h-64 flex items-center justify-center">
+          <canvas id="delayChart"></canvas>
+        </div>
       </div>
+
     </div>
 
+    <!-- Form and Terminal Queue Table -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Left Column: Entry Form -->
+      <!-- Entry Form -->
       <div class="lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center border-b pb-3">
           <h2 id="formHeader" class="text-lg font-bold text-slate-800">Log Truck Entry / Update</h2>
@@ -76,7 +91,6 @@
             <input type="text" id="truckNo" required placeholder="e.g. AA-3-A12345" class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none uppercase font-mono">
           </div>
 
-          <!-- Cargo Type Selection -->
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">CARGO TYPE (ON ARRIVAL) *</label>
             <select id="cargoType" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white font-semibold">
@@ -103,7 +117,15 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 mb-1">OC NAME</label>
-              <input type="text" id="ocName" placeholder="Operational Controller" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
+              <select id="ocName" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
+                <option value="">Select OC</option>
+                <option value="Mihret">Mihret</option>
+                <option value="Misgana">Misgana</option>
+                <option value="Habtamu">Habtamu</option>
+                <option value="Tilahun">Tilahun</option>
+                <option value="Desalegn">Desalegn</option>
+                <option value="Emshaw">Emshaw</option>
+              </select>
             </div>
           </div>
 
@@ -140,12 +162,18 @@
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">DELAY REASON</label>
             <select id="delayReason" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
-              <option value="On Time">On Time / Normal Processing</option>
-              <option value="Dock Congestion">Dock Congestion</option>
-              <option value="Product Unavailability">Product Unavailability</option>
-              <option value="Forklift Delay">Forklift Unavailability</option>
-              <option value="Document Hold">Document Hold</option>
-              <option value="Driver Absent">Driver Absent</option>
+              <option value="">Select Delay Reason (if any)</option>
+              <option value="Product shortage">Product shortage</option>
+              <option value="manpower shortage">manpower shortage</option>
+              <option value="truck shortage">truck shortage</option>
+              <option value="bay congestion">bay congestion</option>
+              <option value="loading capacity">loading capacity</option>
+              <option value="forklift breakdown">forklift breakdown</option>
+              <option value="weather condition">weather condition</option>
+              <option value="FGS gate key">FGS gate key</option>
+              <option value="documentation delay">documentation delay</option>
+              <option value="pallet shortage">pallet shortage</option>
+              <option value="ERP malfunction">ERP malfunction</option>
             </select>
           </div>
 
@@ -162,7 +190,7 @@
         </form>
       </div>
 
-      <!-- Right Column: Active Terminal Queue Table -->
+      <!-- Active Queue Table -->
       <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center border-b pb-3">
           <h2 class="text-lg font-bold text-slate-800">Active Terminal Queue (Inside Yard)</h2>
@@ -196,6 +224,12 @@
   <script>
     const SCRIPT_URL = "<?= ScriptApp.getService().getUrl() ?>"; 
     let activeTrucksData = [];
+    let delayPieChart = null;
+
+    const CHART_COLORS = [
+      '#F59E0B', '#3B82F6', '#EF4444', '#10B981', '#8B5CF6',
+      '#EC4899', '#6366F1', '#14B8A6', '#F97316', '#06B6D4', '#84CC16'
+    ];
 
     function formatDateForInput(dtStr) {
       if (!dtStr) return "";
@@ -230,44 +264,86 @@
       }
     }
 
+    function updatePieChart(delays) {
+      const ctx = document.getElementById('delayChart').getContext('2d');
+      
+      const labels = delays.map(d => d.reason);
+      const dataValues = delays.map(d => parseFloat(d.percentage));
+
+      if (delayPieChart) {
+        delayPieChart.destroy();
+      }
+
+      if (delays.length === 0) {
+        return;
+      }
+
+      delayPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: dataValues,
+            backgroundColor: CHART_COLORS.slice(0, labels.length),
+            borderWidth: 1,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 10,
+                font: { size: 10 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return ` ${context.label}: ${context.raw}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
     async function refreshData() {
       try {
         const res = await fetch(`${SCRIPT_URL}?action=getActive`);
         const data = await res.json();
         
         activeTrucksData = data.activeTrucks || [];
-        
-        // Update Active Stats
-        document.getElementById('statTotalTrucks').innerText = data.stats.totalActive || 0;
-        document.getElementById('statActiveCrate').innerText = data.stats.activeCrate || 0;
-        document.getElementById('statActiveKeg').innerText = data.stats.activeKeg || 0;
+        document.getElementById('activeBadge').innerText = `${activeTrucksData.length} Active`;
 
-        // Update Completed Stats
-        document.getElementById('statTotalCompleted').innerText = data.stats.totalCompleted || 0;
-        document.getElementById('statCompCrate').innerText = data.stats.completedCrate || 0;
-        document.getElementById('statCompKeg').innerText = data.stats.completedKeg || 0;
+        // Render Performance Averages
+        if (data.averages) {
+          document.getElementById('avgDailyTRT').innerText = data.averages.daily.trt;
+          document.getElementById('avgDailyBay').innerText = data.averages.daily.bay;
+          document.getElementById('avgWeeklyTRT').innerText = data.averages.weekly.trt;
+          document.getElementById('avgWeeklyBay').innerText = data.averages.weekly.bay;
+          document.getElementById('avgMonthlyTRT').innerText = data.averages.monthly.trt;
+          document.getElementById('avgMonthlyBay').innerText = data.averages.monthly.bay;
+        }
 
-        document.getElementById('activeBadge').innerText = `${data.stats.totalActive || 0} Active`;
+        // Render Monthly Delay Breakdown Summary List & Chart
+        const delayContainer = document.getElementById('delayBreakdownList');
+        if (data.monthlyDelays && data.monthlyDelays.length > 0) {
+          delayContainer.innerHTML = data.monthlyDelays.map(d => `
+            <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-100">
+              <span class="font-medium text-slate-700 capitalize truncate">${d.reason}</span>
+              <span class="font-bold text-slate-900 ml-1">${d.percentage}% (${d.count})</span>
+            </div>
+          `).join('');
 
-        // Calculate Average Residence
-        if (activeTrucksData.length > 0) {
-          let totalHrs = 0;
-          let validCount = 0;
-          const now = new Date();
-
-          activeTrucksData.forEach(t => {
-            if (t.gateIn) {
-              const gIn = new Date(t.gateIn);
-              if (!isNaN(gIn.getTime())) {
-                totalHrs += (now - gIn) / (1000 * 60 * 60);
-                validCount++;
-              }
-            }
-          });
-
-          document.getElementById('statAvgResidence').innerText = validCount > 0 ? (totalHrs / validCount).toFixed(1) + " hrs" : "-- hrs";
+          updatePieChart(data.monthlyDelays);
         } else {
-          document.getElementById('statAvgResidence').innerText = "0.0 hrs";
+          delayContainer.innerHTML = `<p class="text-slate-400 italic">No delay reasons logged this month.</p>`;
+          updatePieChart([]);
         }
 
         renderTable();
@@ -324,7 +400,7 @@
       document.getElementById('bayIn').value = formatDateForInput(t.bayIn);
       document.getElementById('bayOut').value = formatDateForInput(t.bayOut);
       document.getElementById('gateOut').value = formatDateForInput(t.gateOut);
-      document.getElementById('delayReason').value = t.delayReason || "On Time";
+      document.getElementById('delayReason').value = t.delayReason || "";
       document.getElementById('ocNotes').value = t.ocNotes || "";
 
       calculateMetrics();
@@ -378,6 +454,7 @@
       } catch (err) {
         msg.innerText = '❌ Error saving record!';
         msg.className = 'p-3 mt-3 text-center rounded-lg font-bold text-sm bg-red-100 text-red-800 border border-red-300';
+      } font-bold text-sm bg-red-100 text-red-800 border border-red-300';
       } finally {
         msg.classList.remove('hidden');
         btn.disabled = false;
