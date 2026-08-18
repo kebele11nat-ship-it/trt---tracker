@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <!-- Card 3 (Updated Metric: Daily Avg TRT) -->
+      <!-- Card 3 -->
       <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg relative overflow-hidden group hover:border-slate-600 transition">
         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition"></div>
         <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3">Daily Avg TRT</h3>
@@ -94,11 +94,11 @@
             <tr class="bg-slate-900/60 text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-700/60">
               <th class="py-4 px-5 font-bold">Truck No</th>
               <th class="py-4 px-5 font-bold">Action</th>
+              <th class="py-4 px-5 font-bold">Status</th>
               <th class="py-4 px-5 font-bold">Cargo</th>
               <th class="py-4 px-5 font-bold">SO No</th>
               <th class="py-4 px-5 font-bold">OC Name</th>
               <th class="py-4 px-5 font-bold">Gate In</th>
-              <th class="py-4 px-5 font-bold">Status</th>
             </tr>
           </thead>
           <tbody id="queueTableBody" class="divide-y divide-slate-700/40 font-medium">
@@ -295,11 +295,11 @@
               <td class="py-4 px-5">
                 <button onclick="editTruck(${index})" class="px-3 py-1.5 bg-slate-700 hover:bg-indigo-600 text-white rounded-lg text-xs font-bold transition shadow">Edit / Checkout</button>
               </td>
+              <td class="py-4 px-5"><span class="px-3 py-1 text-[11px] font-extrabold rounded-full border ${statusStyle}">${statusText}</span></td>
               <td class="py-4 px-5">${item.cargoType}</td>
               <td class="py-4 px-5 text-slate-400">${item.soNo || '-'}</td>
               <td class="py-4 px-5 text-slate-300">${item.ocName || '-'}</td>
               <td class="py-4 px-5 text-xs text-slate-400 font-mono">${formattedGateIn}</td>
-              <td class="py-4 px-5"><span class="px-3 py-1 text-[11px] font-extrabold rounded-full border ${statusStyle}">${statusText}</span></td>
             </tr>
           `;
         }).join('');
@@ -309,7 +309,6 @@
       }
     }
 
-    // Calculates Daily Avg TRT (Gate Out - Gate In in hours)
     function calculateDailyAvgTRT(trucks) {
       const now = new Date();
       let totalHours = 0;
@@ -445,7 +444,6 @@
       } catch (err) {
         msg.innerText = '❌ Error updating database: ' + err.message;
         msg.className = 'p-4 mt-6 text-center rounded-lg font-bold text-sm bg-rose-500/10 text-rose-300 border border-rose-500/30 shadow-lg';
-      } font-bold text-sm bg-rose-500/10 text-rose-300 border border-rose-500/30 shadow-lg';
       } finally {
         msg.classList.remove('hidden');
         btn.disabled = false;
