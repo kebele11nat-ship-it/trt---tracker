@@ -6,7 +6,9 @@
   <title>TRT Residence Time Tracker - Hawasa</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
 
@@ -30,8 +32,8 @@
       </button>
     </header>
 
-    <!-- Top Indicators -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <!-- Volume Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg">
         <h3 class="text-xs font-extrabold text-slate-400 uppercase mb-3">Today's Gate In Volume</h3>
         <div class="flex justify-between items-end">
@@ -53,24 +55,12 @@
           </div>
         </div>
       </div>
-
-      <!-- DAILY AVG TRT (TOP DISPLAY) -->
-      <div class="bg-slate-800/60 p-6 rounded-2xl border border-slate-700/50 shadow-lg">
-        <h3 class="text-xs font-extrabold text-slate-400 uppercase mb-3">Daily Avg TRT</h3>
-        <div class="flex justify-between items-end">
-          <span id="avgResidenceTime" class="text-4xl font-black text-emerald-400">0.0 hrs</span>
-          <span class="text-[11px] font-bold text-slate-400 bg-slate-700/50 px-2 py-1 rounded-md">Gate Out - Gate In</span>
-        </div>
-      </div>
     </div>
 
     <!-- Active Queue Table -->
     <section class="bg-slate-800/80 rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
       <div class="p-6 border-b border-slate-700/60 flex justify-between items-center bg-slate-800/40">
-        <div>
-          <h2 class="text-lg font-bold text-white">Active Terminal Queue</h2>
-          <p class="text-xs text-slate-400">Trucks currently inside Hawasa yard boundary</p>
-        </div>
+        <h2 class="text-lg font-bold text-white">Active Terminal Queue</h2>
         <span id="activeBadge" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-extrabold px-3.5 py-1.5 rounded-full">0 Active</span>
       </div>
 
@@ -79,35 +69,19 @@
           <thead>
             <tr class="bg-slate-900/60 text-slate-400 uppercase text-[11px] tracking-wider border-b border-slate-700/60">
               <th class="py-4 px-5 font-bold">Truck No</th>
-              <th class="py-4 px-5 font-bold">Status</th>
-              <th class="py-4 px-5 font-bold">Dwell Time</th>
               <th class="py-4 px-5 font-bold">Cargo</th>
               <th class="py-4 px-5 font-bold">SO No</th>
               <th class="py-4 px-5 font-bold">OC Name</th>
               <th class="py-4 px-5 font-bold">Gate In</th>
+              <th class="py-4 px-5 font-bold">Status</th>
             </tr>
           </thead>
           <tbody id="queueTableBody" class="divide-y divide-slate-700/40 font-medium">
             <tr>
-              <td colspan="7" class="text-center py-10 text-slate-500 italic">Loading active yard queue...</td>
+              <td colspan="6" class="text-center py-10 text-slate-500 italic">Loading active yard queue...</td>
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <!-- DELAY REASON CONTRIBUTION (BOTTOM SECTION) -->
-    <section class="bg-slate-800/80 p-6 md:p-8 rounded-2xl shadow-xl border border-slate-700/60">
-      <div class="flex items-center gap-3 border-b border-slate-700/60 pb-4 mb-6">
-        <div class="w-2.5 h-6 bg-amber-500 rounded-full"></div>
-        <div>
-          <h2 class="text-lg font-bold text-white">Delay Reason Contribution</h2>
-          <p class="text-xs text-slate-400">Proportional percentage breakdown of active delay factors</p>
-        </div>
-      </div>
-
-      <div id="delayBreakdownContainer" class="space-y-4">
-        <p class="text-sm text-slate-500 italic">No active delay reasons reported.</p>
       </div>
     </section>
 
@@ -116,13 +90,11 @@
   <script>
     async function refreshData() {
       const tbody = document.getElementById('queueTableBody');
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-500 italic">Loading active yard queue...</td></tr>`;
 
       try {
         const response = await fetch(`${SCRIPT_URL}?action=getActive`);
         const data = await response.json();
 
-        // Update Volumes
         document.getElementById('dailyTotal').innerText = data.counts.daily.total;
         document.getElementById('dailyCrate').innerText = data.counts.daily.crate;
         document.getElementById('dailyKeg').innerText = data.counts.daily.keg;
@@ -131,98 +103,37 @@
         document.getElementById('monthlyCrate').innerText = data.counts.monthly.crate;
         document.getElementById('monthlyKeg').innerText = data.counts.monthly.keg;
 
-        // Daily Avg TRT (Top)
-        document.getElementById('avgResidenceTime').innerText = `${data.dailyAvgTRT || '0.0'} hrs`;
-
         const activeTrucks = data.activeTrucks || [];
         document.getElementById('activeBadge').innerText = `${activeTrucks.length} Active`;
 
-        renderDelayContribution(activeTrucks);
-
         if (activeTrucks.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-slate-500 font-medium">No active trucks inside the yard</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-500">No active trucks inside the yard</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = activeTrucks.map((item) => {
-          let statusText = "Gate In";
-          let statusStyle = "bg-blue-500/10 text-blue-400 border-blue-500/30";
-
-          if (item.bayOut) {
-            statusText = "Bay Out";
-            statusStyle = "bg-purple-500/10 text-purple-400 border-purple-500/30";
-          } else if (item.bayIn) {
-            statusText = "Bay Loading";
-            statusStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
-          }
-
-          // DWELL TIME COLOR CODING (> 3.0 Hours Highlight)
-          const isOver3Hours = item.dwellHours > 3.0;
-          const dwellStyle = isOver3Hours 
-            ? "bg-rose-500/20 text-rose-300 border-rose-500/40 font-black animate-pulse" 
-            : "bg-slate-700/50 text-slate-300 border-slate-600";
-
-          const formattedGateIn = item.gateIn ? new Date(item.gateIn).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '-';
-
-          return `
-            <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/30 text-slate-200">
-              <td class="py-4 px-5 font-black text-white">${item.truckNo}</td>
-              <td class="py-4 px-5"><span class="px-3 py-1 text-[11px] font-extrabold rounded-full border ${statusStyle}">${statusText}</span></td>
-              <td class="py-4 px-5">
-                <span class="px-3 py-1 text-xs rounded-lg border ${dwellStyle}">
-                  ${item.dwellHours || '0.0'} hrs ${isOver3Hours ? '⚠️ EXCEEDED' : ''}
-                </span>
-              </td>
-              <td class="py-4 px-5">${item.cargoType}</td>
-              <td class="py-4 px-5 text-slate-400">${item.soNo || '-'}</td>
-              <td class="py-4 px-5 text-slate-300">${item.ocName || '-'}</td>
-              <td class="py-4 px-5 text-xs text-slate-400 font-mono">${formattedGateIn}</td>
-            </tr>
-          `;
-        }).join('');
+        tbody.innerHTML = activeTrucks.map((item) => `
+          <tr class="hover:bg-slate-700/30 transition border-b border-slate-700/30 text-slate-200">
+            <td class="py-4 px-5 font-black text-white">${item.truckNo}</td>
+            <td class="py-4 px-5">${item.cargoType}</td>
+            <td class="py-4 px-5 text-slate-400">${item.soNo || '-'}</td>
+            <td class="py-4 px-5 text-slate-300">${item.ocName || '-'}</td>
+            <td class="py-4 px-5 text-xs text-slate-400 font-mono">${item.gateIn ? new Date(item.gateIn).toLocaleString() : '-'}</td>
+            <td class="py-4 px-5">
+              <span class="px-2.5 py-1 bg-amber-500/10 text-amber-300 border border-amber-500/30 text-xs rounded-lg">Active</span>
+            </td>
+          </tr>
+        `).join('');
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-rose-400 font-semibold">Failed to fetch data from TRT_Master_Database</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-400 font-semibold">Failed to fetch data from TRT_Master_Database</td></tr>`;
       }
     }
 
-    function renderDelayContribution(trucks) {
-      const container = document.getElementById('delayBreakdownContainer');
-      const counts = {};
-      let totalDelays = 0;
-
-      trucks.forEach(t => {
-        if (t.delayReason && t.delayReason.trim() !== '') {
-          const reason = t.delayReason.trim();
-          counts[reason] = (counts[reason] || 0) + 1;
-          totalDelays++;
-        }
-      });
-
-      if (totalDelays === 0) {
-        container.innerHTML = `<p class="text-sm text-slate-500 italic">No delay reasons reported in active queue.</p>`;
-        return;
-      }
-
-      container.innerHTML = Object.keys(counts).map(reason => {
-        const count = counts[reason];
-        const pct = Math.round((count / totalDelays) * 100);
-
-        return `
-          <div>
-            <div class="flex justify-between text-xs font-bold text-slate-300 mb-1.5">
-              <span>${reason} (${count} Trucks)</span>
-              <span class="text-amber-400">${pct}% Contribution</span>
-            </div>
-            <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden p-0.5 border border-slate-700">
-              <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
+    // Initial Load
     refreshData();
+
+    // Auto Refresh Queue Every 30 Seconds
+    setInterval(refreshData, 30000);
   </script>
 </body>
 </html>
