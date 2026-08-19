@@ -1,313 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BGI Hawasa - TRT Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1e3a8a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>TRT Tracker</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { -webkit-tap-highlight-color: transparent; }
+    input, select, textarea, button { font-size: 16px !important; }
+  </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans p-4 md:p-8">
+<body class="bg-slate-100 min-h-screen pb-12 font-sans select-none">
 
-  <div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- Top Bar Header -->
-    <div class="bg-slate-900 text-white p-6 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-center gap-4">
+  <!-- MOBILE HEADER -->
+  <header class="sticky top-0 z-50 bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center">
+    <div>
+      <h1 class="text-xl font-bold tracking-tight">TRT Tracker</h1>
+      <p class="text-xs text-blue-200">Hawasa Terminal Operations</p>
+    </div>
+    <button onclick="refreshData()" class="bg-blue-800 hover:bg-blue-700 active:scale-95 text-xs font-semibold px-3 py-2 rounded-lg border border-blue-600 transition">
+      🔄 Refresh
+    </button>
+  </header>
+
+  <main class="max-w-md mx-auto p-3 space-y-4">
+
+    <!-- CATEGORIZED IN-YARD QUEUE -->
+    <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">In-Yard Status Queue</h2>
+        <span id="activeCount" class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">0 Active</span>
+      </div>
+
+      <!-- CATEGORY 1: AT PARKING YARD -->
       <div>
-        <h1 class="text-2xl font-black tracking-wide text-amber-400">BGI HAWASA YARD MANAGEMENT</h1>
-        <p class="text-sm text-slate-300">Truck Residence Time (TRT) & Fleet Flow Monitor</p>
-      </div>
-      <button onclick="refreshData()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-sm shadow transition">
-        🔄 Refresh Live Queue
-      </button>
-    </div>
-
-    <!-- Active Count & Completed Performance Metrics -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-bold text-slate-500 uppercase">Active In Yard</p>
-        <p id="statTotalTrucks" class="text-3xl font-black text-slate-800 mt-1">0</p>
-        <span class="text-xs text-slate-400">Currently Open</span>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
-        <p class="text-xs font-bold text-slate-500 uppercase">Active Crates / Kegs</p>
-        <div class="flex items-baseline space-x-2 mt-1">
-          <span id="statActiveCrate" class="text-2xl font-black text-blue-600">0</span><span class="text-xs text-slate-400">Crate</span>
-          <span class="text-slate-300">|</span>
-          <span id="statActiveKeg" class="text-2xl font-black text-emerald-600">0</span><span class="text-xs text-slate-400">Keg</span>
+        <div class="flex justify-between items-center mb-1.5">
+          <h3 class="text-xs font-bold text-slate-700 uppercase">🅿️ At Parking Yard (Awaiting Bay)</h3>
+          <span id="parkingCount" class="text-[10px] font-bold text-slate-500">0 Trucks</span>
         </div>
-        <span class="text-xs text-slate-400">Active Cargo Split</span>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-indigo-500">
-        <p class="text-xs font-bold text-slate-500 uppercase">Completed Total</p>
-        <p id="statTotalCompleted" class="text-3xl font-black text-indigo-600 mt-1">0</p>
-        <span class="text-xs text-slate-400">Total Departed</span>
-      </div>
-
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
-        <p class="text-xs font-bold text-slate-500 uppercase">Completed Breakdown</p>
-        <div class="flex items-baseline space-x-2 mt-1">
-          <span id="statCompCrate" class="text-2xl font-black text-blue-600">0</span><span class="text-xs text-slate-400">Crate</span>
-          <span class="text-slate-300">|</span>
-          <span id="statCompKeg" class="text-2xl font-black text-emerald-600">0</span><span class="text-xs text-slate-400">Keg</span>
+        <div id="parkingTrucksList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <div class="text-xs text-slate-400 italic">Loading parking queue...</div>
         </div>
-        <span class="text-xs text-slate-400">Departed Cargo Split</span>
       </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-bold text-slate-500 uppercase">Avg Active Residence</p>
-        <p id="statAvgResidence" class="text-3xl font-black text-amber-600 mt-1">-- hrs</p>
-        <span class="text-xs text-slate-400">Live Yard Duration</span>
-      </div>
-    </div>
+      <hr class="border-slate-200" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <!-- Left Column: Entry Form -->
-      <div class="lg:col-span-1 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
-          <h2 id="formHeader" class="text-lg font-bold text-slate-800">Log Truck Entry / Update</h2>
-          <button type="button" onclick="clearForm()" class="text-xs text-slate-500 hover:text-slate-800 underline">Reset</button>
+      <!-- CATEGORY 2: AT LOADING BAY -->
+      <div>
+        <div class="flex justify-between items-center mb-1.5">
+          <h3 class="text-xs font-bold text-slate-700 uppercase">🏭 At Loading Bay (In Operation)</h3>
+          <span id="bayCount" class="text-[10px] font-bold text-slate-500">0 Trucks</span>
         </div>
+        <div id="bayTrucksList" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <div class="text-xs text-slate-400 italic">Loading bay queue...</div>
+        </div>
+      </div>
+    </section>
 
-        <form id="trtForm" class="space-y-3">
+    <!-- MAIN FORM -->
+    <section class="bg-white p-4 rounded-xl shadow-lg border border-slate-200">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-base font-bold text-slate-800" id="formHeader">Log Truck Entry / Update</h2>
+        <button type="button" onclick="clearForm()" class="text-xs text-slate-500 underline">Reset</button>
+      </div>
+
+      <form id="trtForm" class="space-y-4">
+        
+        <!-- SEPARATED AGENT & OC FIELDS -->
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">TRUCK NO *</label>
-            <input type="text" id="truckNo" required placeholder="e.g. AA-3-A12345" class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none uppercase font-mono">
+            <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">👤 Agent Name</label>
+            <input type="text" id="agentName" placeholder="Agent Name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50 font-semibold text-slate-800" />
           </div>
-
-          <!-- Cargo Type Selection -->
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">CARGO TYPE (ON ARRIVAL) *</label>
-            <select id="cargoType" required class="w-full border border-slate-300 rounded p-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white font-semibold">
-              <option value="Crate">📦 Crate</option>
-              <option value="Keg">🍺 Keg</option>
+            <label class="block text-[11px] font-bold text-blue-900 uppercase mb-1">🎮 Operation Controller *</label>
+            <select id="ocName" required class="w-full p-3 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-blue-50/50 font-semibold text-slate-800">
+              <option value="">-- Select OC --</option>
+              <option value="Misgana">Misgana</option>
+              <option value="Habtamu">Habtamu</option>
+              <option value="Tilahun">Tilahun</option>
+              <option value="Desalegn">Desalegn</option>
+              <option value="Mihret">Mihret</option>
+              <option value="Emshaw">Emshaw</option>
             </select>
           </div>
+        </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">DRIVER NAME</label>
-              <input type="text" id="driverName" placeholder="Driver name" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">SO NUMBER</label>
-              <input type="text" id="soNo" placeholder="SO-XXXXX" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
+        <!-- TRUCK & DRIVER -->
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Truck / Plate *</label>
+            <input type="text" id="truckNo" required placeholder="e.g. 3-12345" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50" />
           </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">AGENT NAME</label>
-              <input type="text" id="agentName" placeholder="Agent / Transport" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">OC NAME</label>
-              <input type="text" id="ocName" placeholder="Operational Controller" class="w-full border border-slate-300 rounded p-2 text-sm outline-none">
-            </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Driver Name</label>
+            <input type="text" id="driverName" placeholder="Driver" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50" />
           </div>
+        </div>
 
-          <hr class="my-2 border-slate-200">
+        <!-- SO NUMBER -->
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">SO Number</label>
+          <input type="text" id="soNo" placeholder="Sales Order Number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50" />
+        </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">GATE IN</label>
-              <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
+        <!-- TIMESTAMPS -->
+        <div class="space-y-3 pt-2 border-t border-slate-100">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-[11px] font-bold text-slate-700 uppercase">1. Gate In</label>
+              <button type="button" onclick="setNow('gateIn')" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded active:scale-95">⚡ Set Now</button>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">BAY IN</label>
-              <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">BAY OUT</label>
-              <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">GATE OUT</label>
-              <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full border border-slate-300 rounded p-1.5 text-xs">
-            </div>
-          </div>
-
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1 font-mono">
-            <div class="flex justify-between"><span>Parking Time:</span><span id="dispParking" class="font-bold">-- hrs</span></div>
-            <div class="flex justify-between"><span>Loading Time:</span><span id="dispLoading" class="font-bold">-- hrs</span></div>
-            <div class="flex justify-between text-slate-900 font-bold border-t border-slate-200 pt-1"><span>Total Residence:</span><span id="dispTotal" class="text-amber-600">-- hrs</span></div>
+            <input type="datetime-local" id="gateIn" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">DELAY REASON</label>
-            <select id="delayReason" class="w-full border border-slate-300 rounded p-2 text-sm outline-none bg-white">
-              <option value="On Time">On Time / Normal Processing</option>
-              <option value="Dock Congestion">Dock Congestion</option>
-              <option value="Product Unavailability">Product Unavailability</option>
-              <option value="Forklift Delay">Forklift Unavailability</option>
-              <option value="Document Hold">Document Hold</option>
-              <option value="Driver Absent">Driver Absent</option>
-            </select>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-[11px] font-bold text-slate-700 uppercase">2. Bay In</label>
+              <button type="button" onclick="setNow('bayIn')" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded active:scale-95">⚡ Set Now</button>
+            </div>
+            <input type="datetime-local" id="bayIn" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">OC NOTES</label>
-            <textarea id="ocNotes" rows="2" placeholder="Operational notes..." class="w-full border border-slate-300 rounded p-2 text-sm outline-none"></textarea>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-[11px] font-bold text-slate-700 uppercase">3. Bay Out</label>
+              <button type="button" onclick="setNow('bayOut')" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded active:scale-95">⚡ Set Now</button>
+            </div>
+            <input type="datetime-local" id="bayOut" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
           </div>
 
-          <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-sm shadow transition">
-            💾 Save & Update Record
-          </button>
-
-          <div id="statusMsg" class="hidden p-3 text-center rounded-lg font-bold text-sm"></div>
-        </form>
-      </div>
-
-      <!-- Right Column: Active Terminal Queue Table -->
-      <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
-          <h2 class="text-lg font-bold text-slate-800">Active Terminal Queue (Inside Yard)</h2>
-          <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-full" id="activeBadge">0 Active</span>
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-[11px] font-bold text-slate-700 uppercase">4. Gate Out</label>
+              <button type="button" onclick="setNow('gateOut')" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded active:scale-95">⚡ Set Now</button>
+            </div>
+            <input type="datetime-local" id="gateOut" onchange="calculateMetrics()" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
+          </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-100 text-slate-600 text-xs uppercase font-bold border-b">
-              <tr>
-                <th class="p-3">Truck No</th>
-                <th class="p-3">Cargo Type</th>
-                <th class="p-3">SO No</th>
-                <th class="p-3">Gate In</th>
-                <th class="p-3">Status</th>
-                <th class="p-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody id="activeTableBody" class="divide-y divide-slate-100">
-              <tr>
-                <td colspan="6" class="text-center p-6 text-slate-400">Loading active yard list...</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- METRICS DISPLAY CARD (HOURS) -->
+        <div class="grid grid-cols-3 gap-1 bg-slate-800 text-white p-3 rounded-xl text-center shadow-inner mt-3">
+          <div>
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Parking Time</span>
+            <span id="dispParking" class="text-xs font-bold text-amber-300">-- hrs</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Loading Time</span>
+            <span id="dispLoading" class="text-xs font-bold text-amber-300">-- hrs</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-bold text-slate-400 uppercase">Total TRT</span>
+            <span id="dispTotal" class="text-xs font-bold text-green-400">-- hrs</span>
+          </div>
         </div>
+
+        <!-- DELAY REASON -->
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Delay Reason</label>
+          <select id="delayReason" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50">
+            <option value="On Time">None (On Time)</option>
+            <option value="Product Shortage">Product Shortage</option>
+            <option value="Truck Shortage">Truck Shortage</option>
+            <option value="Bay Congestion">Bay Congestion</option>
+            <option value="Loading Capacity">Loading Capacity</option>
+            <option value="Forklift breakdown">Forklift breakdown</option>
+            <option value="Manpower shortage">Manpower shortage</option>
+            <option value="Weather Condition">Weather Condition</option>
+            <option value="FGS Gate Key">FGS Gate Key</option>
+            <option value="Documentation Delay">Documentation Delay</option>
+            <option value="Pallet Shortage">Pallet Shortage</option>
+            <option value="ERP Malfunction">ERP Malfunction</option>
+          </select>
+        </div>
+
+        <!-- NOTES -->
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Operational Notes</label>
+          <textarea id="ocNotes" rows="2" placeholder="Optional notes..." class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-slate-50"></textarea>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <button type="submit" id="submitBtn" class="w-full bg-blue-900 active:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition duration-150 active:scale-[0.98]">
+          💾 Save & Update Record
+        </button>
+      </form>
+
+      <div id="statusMsg" class="hidden p-3 mt-3 text-center rounded-lg font-bold text-sm"></div>
+    </section>
+
+    <!-- COMPOSITION OF DELAY REASON -->
+    <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">⚠️ Delay Reason Composition</h2>
+        <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Completed Log</span>
+      </div>
+      <div id="delayCompositionList" class="space-y-2 text-xs">
+        <div class="text-xs text-slate-400 italic">Loading delay stats...</div>
+      </div>
+    </section>
+
+    <!-- PERFORMANCE AVERAGES (MOVED TO LAST ROW) -->
+    <section class="bg-white p-4 rounded-xl shadow-md border border-slate-200 space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">📊 Performance Averages</h2>
+        <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Completed Trucks</span>
       </div>
 
-    </div>
-  </div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <!-- TODAY -->
+        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase">Daily (Today)</span>
+          <div class="mt-1 space-y-0.5">
+            <div><span id="avgTrtToday" class="text-xs font-bold">--</span> <span class="text-[9px] text-slate-500">TRT</span></div>
+            <div><span id="avgBayToday" class="text-xs font-semibold">--</span> <span class="text-[9px] text-slate-500">Bay</span></div>
+          </div>
+        </div>
+
+        <!-- WEEKLY -->
+        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase">Weekly (7d)</span>
+          <div class="mt-1 space-y-0.5">
+            <div><span id="avgTrtWeek" class="text-xs font-bold">--</span> <span class="text-[9px] text-slate-500">TRT</span></div>
+            <div><span id="avgBayWeek" class="text-xs font-semibold">--</span> <span class="text-[9px] text-slate-500">Bay</span></div>
+          </div>
+        </div>
+
+        <!-- MONTHLY -->
+        <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+          <span class="block text-[10px] font-bold text-slate-500 uppercase">Monthly (30d)</span>
+          <div class="mt-1 space-y-0.5">
+            <div><span id="avgTrtMonth" class="text-xs font-bold">--</span> <span class="text-[9px] text-slate-500">TRT</span></div>
+            <div><span id="avgBayMonth" class="text-xs font-semibold">--</span> <span class="text-[9px] text-slate-500">Bay</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- COLOR KEY LEGEND -->
+      <div class="flex justify-around items-center text-[9px] text-slate-500 pt-1 border-t border-slate-100">
+        <span>🔴 <b>TRT</b> > 6h | 🟢 ≤ 6h</span>
+        <span>🔴 <b>Bay</b> > 3h | 🟢 ≤ 3h</span>
+      </div>
+    </section>
+
+  </main>
 
   <script>
-    const SCRIPT_URL = "<?= ScriptApp.getService().getUrl() ?>"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztXoM4R9ySCnKkE43nvHQaZEHa3Te2EdoO6czjETE57M-dhd_MDXiBdweKzF7UKD6V/exec";
     let activeTrucksData = [];
 
-    function formatDateForInput(dtStr) {
-      if (!dtStr) return "";
-      const d = new Date(dtStr);
+    function setNow(fieldId) {
+      const now = new Date();
+      const pad = (n) => (n < 10 ? '0' + n : n);
+      const formatted = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      document.getElementById(fieldId).value = formatted;
+      calculateMetrics();
+    }
+
+    function formatDateForInput(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
       if (isNaN(d.getTime())) return "";
-      const pad = (n) => String(n).padStart(2, '0');
+      const pad = (n) => (n < 10 ? '0' + n : n);
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
     function calculateMetrics() {
-      const gIn = document.getElementById('gateIn').value ? new Date(document.getElementById('gateIn').value) : null;
-      const bIn = document.getElementById('bayIn').value ? new Date(document.getElementById('bayIn').value) : null;
-      const bOut = document.getElementById('bayOut').value ? new Date(document.getElementById('bayOut').value) : null;
-      const gOut = document.getElementById('gateOut').value ? new Date(document.getElementById('gateOut').value) : null;
+      const gIn = document.getElementById('gateIn').value;
+      const bIn = document.getElementById('bayIn').value;
+      const bOut = document.getElementById('bayOut').value;
+      const gOut = document.getElementById('gateOut').value;
 
-      if (gIn && bIn && bIn >= gIn) {
-        document.getElementById('dispParking').innerText = ((bIn - gIn) / (1000 * 60 * 60)).toFixed(2) + " hrs";
-      } else {
-        document.getElementById('dispParking').innerText = "-- hrs";
+      let pHrs = "--", lHrs = "--", tHrs = "--";
+
+      if (gIn && bIn) {
+        const diffHrs = ((new Date(bIn) - new Date(gIn)) / (1000 * 60 * 60)).toFixed(1);
+        pHrs = (diffHrs >= 0 ? diffHrs : 0) + " hrs";
+      }
+      if (bIn && bOut) {
+        const diffHrs = ((new Date(bOut) - new Date(bIn)) / (1000 * 60 * 60)).toFixed(1);
+        lHrs = (diffHrs >= 0 ? diffHrs : 0) + " hrs";
+      }
+      if (gIn && gOut) {
+        const diffHrs = ((new Date(gOut) - new Date(gIn)) / (1000 * 60 * 60)).toFixed(1);
+        tHrs = (diffHrs >= 0 ? diffHrs : 0) + " hrs";
       }
 
-      if (bIn && bOut && bOut >= bIn) {
-        document.getElementById('dispLoading').innerText = ((bOut - bIn) / (1000 * 60 * 60)).toFixed(2) + " hrs";
-      } else {
-        document.getElementById('dispLoading').innerText = "-- hrs";
-      }
-
-      if (gIn && gOut && gOut >= gIn) {
-        document.getElementById('dispTotal').innerText = ((gOut - gIn) / (1000 * 60 * 60)).toFixed(2) + " hrs";
-      } else {
-        document.getElementById('dispTotal').innerText = "-- hrs";
-      }
+      document.getElementById('dispParking').innerText = pHrs;
+      document.getElementById('dispLoading').innerText = lHrs;
+      document.getElementById('dispTotal').innerText = tHrs;
     }
 
-    async function refreshData() {
+    function getDiffInHours(startStr, endStr) {
+      if (!startStr) return 0;
+      const start = new Date(startStr);
+      if (isNaN(start.getTime())) return 0;
+
+      const end = endStr ? new Date(endStr) : new Date();
+      if (isNaN(end.getTime())) return 0;
+
+      const diffHrs = (end - start) / (1000 * 60 * 60);
+      return diffHrs >= 0 ? diffHrs : 0;
+    }
+
+    function refreshData() {
+      fetchActiveTrucks();
+      fetchCompletedAnalytics();
+    }
+
+    async function fetchCompletedAnalytics() {
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=getActive`);
-        const data = await res.json();
-        
-        activeTrucksData = data.activeTrucks || [];
-        
-        // Update Active Stats
-        document.getElementById('statTotalTrucks').innerText = data.stats.totalActive || 0;
-        document.getElementById('statActiveCrate').innerText = data.stats.activeCrate || 0;
-        document.getElementById('statActiveKeg').innerText = data.stats.activeKeg || 0;
+        const response = await fetch(`${SCRIPT_URL}?action=getCompleted`);
+        const completed = await response.json();
 
-        // Update Completed Stats
-        document.getElementById('statTotalCompleted').innerText = data.stats.totalCompleted || 0;
-        document.getElementById('statCompCrate').innerText = data.stats.completedCrate || 0;
-        document.getElementById('statCompKeg').innerText = data.stats.completedKeg || 0;
+        // 1. PERFORMANCE AVERAGES
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
 
-        document.getElementById('activeBadge').innerText = `${data.stats.totalActive || 0} Active`;
+        const filterStats = (startDate) => {
+          let trtSum = 0, trtCount = 0;
+          let baySum = 0, bayCount = 0;
 
-        // Calculate Average Residence
-        if (activeTrucksData.length > 0) {
-          let totalHrs = 0;
-          let validCount = 0;
-          const now = new Date();
-
-          activeTrucksData.forEach(t => {
-            if (t.gateIn) {
-              const gIn = new Date(t.gateIn);
-              if (!isNaN(gIn.getTime())) {
-                totalHrs += (now - gIn) / (1000 * 60 * 60);
-                validCount++;
+          completed.forEach(t => {
+            const gateOutDate = new Date(t.gateOut);
+            if (gateOutDate >= startDate) {
+              if (t.gateIn) {
+                const trtHrs = (gateOutDate - new Date(t.gateIn)) / (1000 * 60 * 60);
+                if (trtHrs >= 0) { trtSum += trtHrs; trtCount++; }
+              }
+              if (t.bayIn && t.bayOut) {
+                const bayHrs = (new Date(t.bayOut) - new Date(t.bayIn)) / (1000 * 60 * 60);
+                if (bayHrs >= 0) { baySum += bayHrs; bayCount++; }
               }
             }
           });
 
-          document.getElementById('statAvgResidence').innerText = validCount > 0 ? (totalHrs / validCount).toFixed(1) + " hrs" : "-- hrs";
+          return {
+            trtVal: trtCount > 0 ? (trtSum / trtCount) : null,
+            bayVal: bayCount > 0 ? (baySum / bayCount) : null
+          };
+        };
+
+        const updateAverageUI = (elementId, value, threshold) => {
+          const el = document.getElementById(elementId);
+          if (value === null) {
+            el.innerText = "--";
+            el.className = "text-xs font-bold text-slate-400";
+            return;
+          }
+          const formatted = value.toFixed(1) + "h";
+          el.innerText = formatted;
+          if (value > threshold) {
+            el.className = "text-xs font-bold text-red-600";
+          } else {
+            el.className = "text-xs font-bold text-emerald-600";
+          }
+        };
+
+        const todayStats = filterStats(startOfToday);
+        const weekStats = filterStats(sevenDaysAgo);
+        const monthStats = filterStats(thirtyDaysAgo);
+
+        // TRT Threshold: 6.0 hrs | Bay Time Threshold: 3.0 hrs
+        updateAverageUI('avgTrtToday', todayStats.trtVal, 6.0);
+        updateAverageUI('avgBayToday', todayStats.bayVal, 3.0);
+
+        updateAverageUI('avgTrtWeek', weekStats.trtVal, 6.0);
+        updateAverageUI('avgBayWeek', weekStats.bayVal, 3.0);
+
+        updateAverageUI('avgTrtMonth', monthStats.trtVal, 6.0);
+        updateAverageUI('avgBayMonth', monthStats.bayVal, 3.0);
+
+        // 2. COMPOSITION OF DELAY REASON
+        const delayCounts = {};
+        let totalDelayedTrucks = 0;
+
+        completed.forEach(t => {
+          const reason = t.delayReason || "On Time";
+          if (reason !== "On Time" && reason !== "None (On Time)") {
+            delayCounts[reason] = (delayCounts[reason] || 0) + 1;
+            totalDelayedTrucks++;
+          }
+        });
+
+        const compositionContainer = document.getElementById('delayCompositionList');
+        if (totalDelayedTrucks === 0) {
+          compositionContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No recorded delays in completed logs.</div>`;
         } else {
-          document.getElementById('statAvgResidence').innerText = "0.0 hrs";
+          const sortedReasons = Object.entries(delayCounts).sort((a, b) => b[1] - a[1]);
+          compositionContainer.innerHTML = sortedReasons.map(([reason, count]) => {
+            const pct = ((count / totalDelayedTrucks) * 100).toFixed(1);
+            return `
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-slate-700">${reason}</span>
+                  <span class="font-bold text-slate-500 text-[11px]">${count} (${pct}%)</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200">
+                  <div class="bg-amber-500 h-2 rounded-full" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
         }
 
-        renderTable();
       } catch (err) {
-        console.error("Error fetching active queue:", err);
+        console.error("Error fetching analytics:", err);
       }
     }
 
-    function renderTable() {
-      const tbody = document.getElementById('activeTableBody');
-      if (activeTrucksData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center p-6 text-slate-400">No active trucks inside the yard right now.</td></tr>`;
-        return;
+    async function fetchActiveTrucks() {
+      const parkingContainer = document.getElementById('parkingTrucksList');
+      const bayContainer = document.getElementById('bayTrucksList');
+      const countBadge = document.getElementById('activeCount');
+      
+      parkingContainer.innerHTML = `<div class="text-xs text-slate-400 italic">Updating parking queue...</div>`;
+      bayContainer.innerHTML = `<div class="text-xs text-slate-400 italic">Updating bay queue...</div>`;
+
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=getActive`);
+        const trucks = await response.json();
+        activeTrucksData = trucks;
+
+        countBadge.innerText = `${trucks.length} Active`;
+
+        const parkingTrucks = [];
+        const bayTrucks = [];
+
+        trucks.forEach((t, idx) => {
+          t.originalIndex = idx;
+          if (t.gateIn && (!t.bayIn || t.bayIn === "")) {
+            parkingTrucks.push(t);
+          } else if (t.bayIn) {
+            bayTrucks.push(t);
+          }
+        });
+
+        document.getElementById('parkingCount').innerText = `${parkingTrucks.length} Trucks`;
+        document.getElementById('bayCount').innerText = `${bayTrucks.length} Trucks`;
+
+        // 1. RENDER PARKING QUEUE
+        if (parkingTrucks.length === 0) {
+          parkingContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No trucks in parking yard.</div>`;
+        } else {
+          parkingContainer.innerHTML = parkingTrucks.map(t => {
+            const parkingHours = getDiffInHours(t.gateIn, t.bayIn);
+            const isDelayed = parkingHours > 3.0;
+            
+            const badgeClass = isDelayed 
+              ? "bg-red-100 text-red-800 border-red-300" 
+              : "bg-emerald-100 text-emerald-800 border-emerald-300";
+            const cardBorder = isDelayed 
+              ? "border-red-300 bg-red-50/50" 
+              : "border-slate-200 bg-slate-50";
+
+            return `
+              <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} shadow-sm cursor-pointer hover:bg-slate-100 transition">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
+                  <span class="text-[10px] border ${badgeClass} px-2 py-0.5 rounded-full font-bold">
+                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${parkingHours.toFixed(1)} hrs)
+                  </span>
+                </div>
+                <div class="text-xs text-slate-600 flex justify-between items-center mt-1">
+                  <span><b>SO:</b> ${t.soNo || 'N/A'}</span>
+                  <span class="bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-bold text-[11px]">🎮 OC: ${t.ocName || 'Unassigned'}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // 2. RENDER BAY QUEUE
+        if (bayTrucks.length === 0) {
+          bayContainer.innerHTML = `<div class="text-xs text-slate-400 italic">No trucks at loading bays.</div>`;
+        } else {
+          bayContainer.innerHTML = bayTrucks.map(t => {
+            const bayHours = getDiffInHours(t.bayIn, t.bayOut);
+            const isDelayed = bayHours > 3.0;
+
+            const badgeClass = isDelayed 
+              ? "bg-red-100 text-red-800 border-red-300" 
+              : "bg-emerald-100 text-emerald-800 border-emerald-300";
+            const cardBorder = isDelayed 
+              ? "border-red-300 bg-red-50/50" 
+              : "border-slate-200 bg-slate-50";
+
+            return `
+              <div onclick="selectTruck(${t.originalIndex})" class="p-2.5 rounded-lg border ${cardBorder} shadow-sm cursor-pointer hover:bg-slate-100 transition">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="font-bold text-slate-800 text-sm">${t.truckNo}</span>
+                  <span class="text-[10px] border ${badgeClass} px-2 py-0.5 rounded-full font-bold">
+                    ${isDelayed ? '🚨 > 3 hrs' : '🟢 < 3 hrs'} (${bayHours.toFixed(1)} hrs)
+                  </span>
+                </div>
+                <div class="text-xs text-slate-600 flex justify-between items-center mt-1">
+                  <span><b>SO:</b> ${t.soNo || 'N/A'}</span>
+                  <span class="bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-bold text-[11px]">🎮 OC: ${t.ocName || 'Unassigned'}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+      } catch (err) {
+        parkingContainer.innerHTML = `<div class="text-xs text-red-500 italic">Error loading queue. Tap Refresh.</div>`;
+        bayContainer.innerHTML = ``;
       }
-
-      tbody.innerHTML = activeTrucksData.map((t, idx) => {
-        const cargoBadge = t.cargoType === 'Keg' 
-          ? `<span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded font-bold">🍺 Keg</span>`
-          : `<span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded font-bold">📦 Crate</span>`;
-
-        let statusText = "Parked / Waiting";
-        if (t.bayIn && !t.bayOut) statusText = "Loading at Bay";
-
-        const gateInFormatted = t.gateIn ? new Date(t.gateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
-
-        return `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-mono font-bold text-slate-800">${t.truckNo}</td>
-            <td class="p-3">${cargoBadge}</td>
-            <td class="p-3 text-xs text-slate-600">${t.soNo || '-'}</td>
-            <td class="p-3 text-xs font-mono">${gateInFormatted}</td>
-            <td class="p-3"><span class="text-xs bg-slate-100 text-slate-700 font-semibold px-2 py-1 rounded">${statusText}</span></td>
-            <td class="p-3 text-right">
-              <button onclick="selectTruck(${idx})" class="bg-slate-800 hover:bg-amber-500 hover:text-slate-900 text-white text-xs px-3 py-1.5 rounded transition font-bold">
-                Select / Edit
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
     }
 
     function selectTruck(index) {
@@ -315,7 +520,6 @@
       if (!t) return;
 
       document.getElementById('truckNo').value = t.truckNo || "";
-      document.getElementById('cargoType').value = t.cargoType || "Crate";
       document.getElementById('driverName').value = t.driverName || "";
       document.getElementById('soNo').value = t.soNo || "";
       document.getElementById('agentName').value = t.agentName || "";
@@ -351,7 +555,6 @@
 
       const formData = new URLSearchParams();
       formData.append('truckNo', document.getElementById('truckNo').value);
-      formData.append('cargoType', document.getElementById('cargoType').value);
       formData.append('driverName', document.getElementById('driverName').value);
       formData.append('soNo', document.getElementById('soNo').value);
       formData.append('agentName', document.getElementById('agentName').value);
