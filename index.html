@@ -3,47 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRT Operations Management</title>
+  <title>TRT Operations Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6 flex flex-col min-h-screen">
   <div class="max-w-5xl mx-auto w-full flex-grow space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">Truck Residence Time (TRT) Terminal</h1>
+    <h1 class="text-3xl font-bold text-gray-800">TRT Terminal Tracker</h1>
 
-    <!-- Entry Form -->
+    <!-- Terminal Entry Form -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">Terminal Gate Action</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">Vehicle Entry & Stage Controller</h2>
       
+      <!-- Primary Fields -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <input id="plateNo" type="text" placeholder="Plate No. *" class="border p-2 rounded w-full uppercase focus:ring-2 focus:ring-blue-500">
-        <input id="shipmentType" type="text" placeholder="Shipment Type" class="border p-2 rounded w-full">
+        <input id="plateNo" type="text" placeholder="Plate No. *" class="border p-2 rounded w-full uppercase font-bold focus:ring-2 focus:ring-blue-500">
+        
+        <select id="shipmentType" class="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500">
+          <option value="">Select Shipment Type</option>
+          <option value="Inbound / Raw Material">Inbound / Raw Material</option>
+          <option value="Outbound / Finished Goods">Outbound / Finished Goods</option>
+          <option value="Inter-Plant Transfer">Inter-Plant Transfer</option>
+          <option value="Empty Returns">Empty Returns</option>
+        </select>
+
         <input id="driverName" type="text" placeholder="Driver Name" class="border p-2 rounded w-full">
         <input id="soNumber" type="text" placeholder="SO Number" class="border p-2 rounded w-full">
         <input id="agentName" type="text" placeholder="Agent Name" class="border p-2 rounded w-full">
         <input id="ocName" type="text" placeholder="OC Name" class="border p-2 rounded w-full">
       </div>
 
+      <!-- Time Override / Registry Control -->
+      <div class="mb-4 bg-slate-50 p-3 rounded border border-slate-200">
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Time Registry Control</label>
+        <div class="flex gap-2">
+          <input id="timeRegistry" type="datetime-local" class="border p-2 rounded flex-grow text-gray-700 focus:ring-2 focus:ring-blue-500">
+          <button onclick="setNowTime()" type="button" class="bg-slate-700 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-slate-800">Set Now</button>
+        </div>
+      </div>
+
+      <!-- Optional Remarks -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <input id="delayReason" type="text" placeholder="Delay Reason (Optional / Dropdown)" class="border p-2 rounded w-full">
+        <input id="delayReason" type="text" placeholder="Delay Reason (Optional)" class="border p-2 rounded w-full">
         <input id="ocRemark" type="text" placeholder="OC Remark (Optional)" class="border p-2 rounded w-full">
       </div>
 
+      <!-- Stage Execution Buttons -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <button onclick="submitAction('GATE_IN')" class="bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700">1. Gate In</button>
-        <button onclick="submitAction('BAY_IN')" class="bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">2. Bay In</button>
-        <button onclick="submitAction('BAY_OUT')" class="bg-yellow-600 text-white py-2 rounded font-bold hover:bg-yellow-700">3. Bay Out</button>
-        <button onclick="submitAction('GATE_OUT')" class="bg-red-600 text-white py-2 rounded font-bold hover:bg-red-700">4. Gate Out</button>
+        <button onclick="submitAction('GATE_IN')" class="bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700">1. Gate In</button>
+        <button onclick="submitAction('BAY_IN')" class="bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700">2. Bay In</button>
+        <button onclick="submitAction('BAY_OUT')" class="bg-amber-600 text-white py-3 rounded font-bold hover:bg-amber-700">3. Bay Out</button>
+        <button onclick="submitAction('GATE_OUT')" class="bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700">4. Gate Out</button>
       </div>
     </div>
 
-    <!-- Vehicles On-Site Tracker -->
+    <!-- Active Vehicles Board -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">Active On-Site Trucks</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">Active On-Site Vehicles</h2>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-100 border-b text-gray-600">
               <th class="p-3">Plate No.</th>
+              <th class="p-3">Shipment Type</th>
               <th class="p-3">Driver</th>
               <th class="p-3">SO Number</th>
               <th class="p-3">Status / Stage</th>
@@ -51,7 +72,7 @@
             </tr>
           </thead>
           <tbody id="activeList" class="divide-y divide-gray-200">
-            <tr><td colspan="5" class="p-4 text-center text-gray-400">Loading active vehicles...</td></tr>
+            <tr><td colspan="6" class="p-4 text-center text-gray-400">Loading active vehicles...</td></tr>
           </tbody>
         </table>
       </div>
@@ -61,15 +82,15 @@
   <!-- Bottom Analytics Bar -->
   <footer class="max-w-5xl mx-auto w-full bg-slate-900 text-white p-6 rounded-lg shadow-xl grid grid-cols-3 gap-4 text-center mt-6">
     <div>
-      <p class="text-xs uppercase tracking-wider text-slate-400">Daily Average TRT</p>
+      <p class="text-xs uppercase tracking-wider text-slate-400">Daily Avg TRT</p>
       <p id="avgDaily" class="text-3xl font-extrabold mt-1">-- <span class="text-sm font-normal">min</span></p>
     </div>
     <div>
-      <p class="text-xs uppercase tracking-wider text-slate-400">Weekly Average TRT</p>
+      <p class="text-xs uppercase tracking-wider text-slate-400">Weekly Avg TRT</p>
       <p id="avgWeekly" class="text-3xl font-extrabold mt-1">-- <span class="text-sm font-normal">min</span></p>
     </div>
     <div>
-      <p class="text-xs uppercase tracking-wider text-slate-400">Monthly Average TRT</p>
+      <p class="text-xs uppercase tracking-wider text-slate-400">Monthly Avg TRT</p>
       <p id="avgMonthly" class="text-3xl font-extrabold mt-1">-- <span class="text-sm font-normal">min</span></p>
     </div>
   </footer>
@@ -77,20 +98,60 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztXoM4R9ySCnKkE43nvHQaZEHa3Te2EdoO6czjETE57M-dhd_MDXiBdweKzF7UKD6V/exec";
 
+    function setNowTime() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('timeRegistry').value = now.toISOString().slice(0, 16);
+    }
+
+    async function submitAction(action) {
+      const plateNo = document.getElementById('plateNo').value.trim();
+      if (!plateNo) return alert("Please enter Plate No.");
+
+      let timeVal = document.getElementById('timeRegistry').value;
+      if (!timeVal) {
+        setNowTime();
+        timeVal = document.getElementById('timeRegistry').value;
+      }
+
+      const payload = {
+        action: action,
+        plateNo: plateNo,
+        timestamp: timeVal,
+        shipmentType: document.getElementById('shipmentType').value,
+        driverName: document.getElementById('driverName').value,
+        soNumber: document.getElementById('soNumber').value,
+        agentName: document.getElementById('agentName').value,
+        ocName: document.getElementById('ocName').value,
+        delayReason: document.getElementById('delayReason').value,
+        ocRemark: document.getElementById('ocRemark').value
+      };
+
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      if (action === "GATE_OUT") clearInputs();
+      loadDashboard();
+    }
+
     async function loadDashboard() {
       try {
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         
         const listEl = document.getElementById('activeList');
-        if (data.activeTrucks.length === 0) {
-          listEl.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No trucks currently on-site.</td></tr>';
+        if (!data.activeTrucks || data.activeTrucks.length === 0) {
+          listEl.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-400">No trucks currently on-site.</td></tr>';
         } else {
           listEl.innerHTML = data.activeTrucks.map(t => {
             const entryTime = new Date(t.gateIn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return `
               <tr class="hover:bg-gray-50">
                 <td class="p-3 font-bold text-slate-800">${t.plate}</td>
+                <td class="p-3 text-gray-600">${t.shipmentType || '-'}</td>
                 <td class="p-3 text-gray-600">${t.driver || '-'}</td>
                 <td class="p-3 text-gray-600">${t.soNumber || '-'}</td>
                 <td class="p-3"><span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-0.5 rounded font-semibold">${t.stage}</span></td>
@@ -103,47 +164,26 @@
         document.getElementById('avgWeekly').innerHTML = `${data.averages.weekly} <span class="text-sm font-normal">min</span>`;
         document.getElementById('avgMonthly').innerHTML = `${data.averages.monthly} <span class="text-sm font-normal">min</span>`;
       } catch (err) {
-        console.error("Failed to load TRT data:", err);
+        console.error("Failed to fetch dashboard updates:", err);
       }
     }
 
-    async function submitAction(action) {
-      const plateNo = document.getElementById('plateNo').value.trim();
-      if (!plateNo) return alert("Please enter Plate No.");
-
-      const payload = {
-        action: action,
-        plateNo: plateNo,
-        shipmentType: document.getElementById('shipmentType').value,
-        driverName: document.getElementById('driverName').value,
-        soNumber: document.getElementById('soNumber').value,
-        agentName: document.getElementById('agentName').value,
-        ocName: document.getElementById('ocName').value,
-        delayReason: document.getElementById('delayReason').value,
-        ocRemark: document.getElementById('ocRemark').value
-      };
-
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
-
-      if (action === "GATE_OUT") {
-        document.getElementById('plateNo').value = "";
-        document.getElementById('shipmentType').value = "";
-        document.getElementById('driverName').value = "";
-        document.getElementById('soNumber').value = "";
-        document.getElementById('agentName').value = "";
-        document.getElementById('ocName').value = "";
-        document.getElementById('delayReason').value = "";
-        document.getElementById('ocRemark').value = "";
-      }
-
-      loadDashboard();
+    function clearInputs() {
+      document.getElementById('plateNo').value = "";
+      document.getElementById('shipmentType').value = "";
+      document.getElementById('driverName').value = "";
+      document.getElementById('soNumber').value = "";
+      document.getElementById('agentName').value = "";
+      document.getElementById('ocName').value = "";
+      document.getElementById('delayReason').value = "";
+      document.getElementById('ocRemark').value = "";
+      document.getElementById('timeRegistry').value = "";
     }
 
+    // Initialize clock & dashboard
+    setNowTime();
     loadDashboard();
-    setInterval(loadDashboard, 30000); // 30-second polling
+    setInterval(loadDashboard, 15000);
   </script>
 </body>
 </html>
