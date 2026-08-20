@@ -3,60 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRT Operations Terminal</title>
+  <title>Truck Residence Time (TRT) Terminal</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6 flex flex-col min-h-screen">
   <div class="max-w-5xl mx-auto w-full flex-grow space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">TRT Terminal Tracker</h1>
+    <h1 class="text-3xl font-bold text-gray-800">Truck Residence Time (TRT) Terminal</h1>
 
     <!-- Terminal Entry Form -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-lg font-semibold text-gray-700 mb-4">Vehicle Entry & Stage Controller</h2>
+      <h2 class="text-lg font-semibold text-gray-700 mb-4">Terminal Gate Action</h2>
       
-      <!-- Primary Fields -->
+      <!-- Row 1: Plate, Shipment Type, Driver Name -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <input id="plateNo" type="text" placeholder="Plate No. *" class="border p-2 rounded w-full uppercase font-bold focus:ring-2 focus:ring-blue-500">
+        <input id="plateNo" type="text" placeholder="PLATE NO. *" class="border p-2 rounded w-full uppercase font-bold focus:ring-2 focus:ring-blue-500">
         
-        <select id="shipmentType" class="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500">
-          <option value="">Select Shipment Type</option>
-          <option value="Inbound / Raw Material">Inbound / Raw Material</option>
-          <option value="Outbound / Finished Goods">Outbound / Finished Goods</option>
-          <option value="Inter-Plant Transfer">Inter-Plant Transfer</option>
-          <option value="Empty Returns">Empty Returns</option>
+        <!-- Shipment Type Dropdown -->
+        <select id="shipmentType" class="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 text-gray-700">
+          <option value="">Shipment Type</option>
+          <option value="Crate">Crate</option>
+          <option value="Keg">Keg</option>
         </select>
 
         <input id="driverName" type="text" placeholder="Driver Name" class="border p-2 rounded w-full">
+      </div>
+
+      <!-- Row 2: SO Number, Agent Name, OC Name -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <input id="soNumber" type="text" placeholder="SO Number" class="border p-2 rounded w-full">
         <input id="agentName" type="text" placeholder="Agent Name" class="border p-2 rounded w-full">
-        <input id="ocName" type="text" placeholder="OC Name" class="border p-2 rounded w-full">
+        
+        <!-- OC Name Dropdown -->
+        <select id="ocName" class="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 text-gray-700">
+          <option value="">OC Name</option>
+          <option value="Misgana">Misgana</option>
+          <option value="Habtamu">Habtamu</option>
+          <option value="Tilahun">Tilahun</option>
+          <option value="Desalegn">Desalegn</option>
+          <option value="Mihret">Mihret</option>
+          <option value="Emshaw">Emshaw</option>
+        </select>
       </div>
 
-      <!-- Time Override / Registry Control -->
-      <div class="mb-4 bg-slate-50 p-3 rounded border border-slate-200">
-        <label class="block text-xs font-semibold text-gray-600 mb-1">Time Registry Control</label>
-        <div class="flex gap-2">
-          <input id="timeRegistry" type="datetime-local" class="border p-2 rounded flex-grow text-gray-700 focus:ring-2 focus:ring-blue-500">
-          <button onclick="setNowTime()" type="button" class="bg-slate-700 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-slate-800">Set Now</button>
-        </div>
-      </div>
-
-      <!-- Optional Remarks -->
+      <!-- Row 3: Remarks -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <input id="delayReason" type="text" placeholder="Delay Reason (Optional)" class="border p-2 rounded w-full">
+        <input id="delayReason" type="text" placeholder="Delay Reason (Optional / Dropdown)" class="border p-2 rounded w-full">
         <input id="ocRemark" type="text" placeholder="OC Remark (Optional)" class="border p-2 rounded w-full">
       </div>
 
-      <!-- Stage Execution Buttons -->
+      <!-- Time Log Controls (Placed directly above the stage action buttons) -->
+      <div class="mb-4 bg-slate-50 p-3 rounded border border-slate-200">
+        <label class="block text-xs font-semibold text-gray-600 mb-1">Time Log / Timestamp Control</label>
+        <div class="flex gap-2">
+          <input id="timeRegistry" type="datetime-local" class="border p-2 rounded flex-grow text-gray-700 focus:ring-2 focus:ring-blue-500">
+          <button onclick="setNowTime()" type="button" class="bg-slate-700 text-white px-5 py-2 rounded text-sm font-semibold hover:bg-slate-800">Set Now</button>
+        </div>
+      </div>
+
+      <!-- Stage Buttons -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <button onclick="submitAction('GATE_IN')" class="bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700">1. Gate In</button>
-        <button onclick="submitAction('BAY_IN')" class="bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700">2. Bay In</button>
+        <button onclick="submitAction('GATE_IN')" class="bg-emerald-600 text-white py-3 rounded font-bold hover:bg-emerald-700">1. Gate In</button>
+        <button onclick="submitAction('BAY_IN')" class="bg-indigo-600 text-white py-3 rounded font-bold hover:bg-indigo-700">2. Bay In</button>
         <button onclick="submitAction('BAY_OUT')" class="bg-amber-600 text-white py-3 rounded font-bold hover:bg-amber-700">3. Bay Out</button>
-        <button onclick="submitAction('GATE_OUT')" class="bg-red-600 text-white py-3 rounded font-bold hover:bg-red-700">4. Gate Out</button>
+        <button onclick="submitAction('GATE_OUT')" class="bg-rose-600 text-white py-3 rounded font-bold hover:bg-rose-700">4. Gate Out</button>
       </div>
     </div>
 
-    <!-- Active Vehicles Board -->
+    <!-- Active On-Site Vehicles Board -->
     <div class="bg-white p-6 rounded-lg shadow-md">
       <h2 class="text-lg font-semibold text-gray-700 mb-4">Active On-Site Vehicles</h2>
       <div class="overflow-x-auto">
@@ -106,7 +119,7 @@
 
     async function submitAction(action) {
       const plateNo = document.getElementById('plateNo').value.trim();
-      if (!plateNo) return alert("Please enter Plate No.");
+      if (!plateNo) return alert("Please enter PLATE NO.");
 
       let timeVal = document.getElementById('timeRegistry').value;
       if (!timeVal) {
@@ -164,7 +177,7 @@
         document.getElementById('avgWeekly').innerHTML = `${data.averages.weekly} <span class="text-sm font-normal">min</span>`;
         document.getElementById('avgMonthly').innerHTML = `${data.averages.monthly} <span class="text-sm font-normal">min</span>`;
       } catch (err) {
-        console.error("Failed to fetch dashboard updates:", err);
+        console.error("Dashboard refresh error:", err);
       }
     }
 
@@ -180,7 +193,6 @@
       document.getElementById('timeRegistry').value = "";
     }
 
-    // Initialize clock & dashboard
     setNowTime();
     loadDashboard();
     setInterval(loadDashboard, 15000);
