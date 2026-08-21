@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>TRT - Haw Terminal</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -12,249 +12,349 @@
       --primary: #0f172a;
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
-      --border: #cbd5e1;
+      --border: #e2e8f0;
       --text-main: #0f172a;
-      --text-muted: #475569;
+      --text-muted: #64748b;
       --danger: #dc2626;
       --danger-hover: #b91c1c;
       --success: #16a34a;
-      --focus-ring: #93c5fd;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-      background: var(--bg); 
-      margin: 0; 
-      padding: 12px; 
-      color: var(--text-main); 
-      line-height: 1.4;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 8px;
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container { max-width: 1200px; margin: 0 auto; }
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
     
-    header { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 12px; 
-      background: var(--primary); 
-      color: white; 
-      padding: 14px 16px; 
-      border-radius: 12px; 
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      background: var(--primary);
+      color: white;
+      padding: 10px 12px;
+      border-radius: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    header h1 { margin: 0; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em; }
-    
-    .header-controls { display: flex; align-items: center; gap: 8px; }
-    #status-indicator { 
-      background: rgba(255, 255, 255, 0.2); 
-      padding: 6px 12px; 
-      border-radius: 20px; 
-      font-size: 0.78rem; 
-      font-weight: 600; 
-      white-space: nowrap; 
+
+    header h1 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
-    
-    /* Touch Target Sizing (Min 48px) */
-    .btn-refresh { 
-      background: var(--accent); 
-      color: white; 
-      border: none; 
-      padding: 0 16px; 
-      border-radius: 24px; 
-      font-weight: 600; 
-      font-size: 0.85rem; 
-      cursor: pointer; 
-      min-height: 48px; 
-      display: inline-flex;
+
+    .header-controls {
+      display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 6px;
     }
 
-    .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .kpi-card { 
-      background: var(--card-bg); 
-      border: 1px solid var(--border); 
-      padding: 12px 14px; 
-      border-radius: 12px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: space-between; 
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
+    #status-indicator {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      white-space: nowrap;
     }
-    .kpi-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; line-height: 1.2; }
-    .kpi-value { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-top: 2px; }
-    .kpi-icon { font-size: 1.4rem; }
-
-    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-    @media (min-width: 900px) { .grid { grid-template-columns: 380px 1fr; gap: 24px; } }
     
-    .card { 
-      background: var(--card-bg); 
-      border: 1px solid var(--border); 
-      border-radius: 12px; 
-      padding: 16px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-      margin-bottom: 16px; 
-    }
-    .card h3 { 
-      margin-top: 0; 
-      font-size: 1rem; 
-      font-weight: 700; 
-      color: var(--primary); 
-      border-bottom: 2px solid #f1f5f9; 
-      padding-bottom: 10px; 
-      margin-bottom: 14px; 
+    .btn-refresh {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
     }
 
-    .form-group { margin-bottom: 14px; }
-    label { 
-      display: block; 
-      font-size: 0.78rem; 
-      font-weight: 700; 
-      margin-bottom: 6px; 
-      color: var(--text-muted); 
-      text-transform: uppercase; 
+    /* KPI Cards Row - Compact Grid for Phones */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .kpi-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .kpi-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 2px;
+    }
+
+    .kpi-icon {
+      font-size: 1.2rem;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 900px) {
+      body { padding: 16px; }
+      .container { max-width: 1200px; }
+      .grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; }
+      header h1 { font-size: 1.15rem; }
+      .kpi-row { gap: 12px; }
+      .kpi-card { padding: 12px 14px; }
+      .kpi-value { font-size: 1.4rem; }
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--primary);
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+      color: var(--text-muted);
+      text-transform: uppercase;
       letter-spacing: 0.02em;
     }
     
-    /* Mobile Accessible Form Inputs (16px font prevents iOS auto-zoom) */
-    input, select, textarea { 
-      width: 100%; 
-      padding: 12px 14px; 
-      border: 1px solid var(--border); 
-      border-radius: 8px; 
-      font-size: 16px; 
-      background: #fafafa; 
-      min-height: 48px; 
-      color: var(--text-main);
-      transition: border-color 0.15s, box-shadow 0.15s;
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fafafa;
+      min-height: 44px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%22%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748B%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 10px auto;
+      padding-right: 30px;
+    }
+
+    textarea {
+      font-family: inherit;
+      resize: vertical;
+      min-height: 52px;
     }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--focus-ring);
       background: #ffffff;
     }
-
-    textarea { font-family: inherit; resize: vertical; min-height: 70px; }
     
-    .input-with-btn { display: flex; gap: 8px; }
-    .btn-now { 
-      background: #0284c7; 
-      color: white; 
-      border: none; 
-      border-radius: 8px; 
-      padding: 0 18px; 
-      font-size: 0.9rem; 
-      font-weight: 700; 
-      cursor: pointer; 
-      white-space: nowrap; 
-      min-height: 48px; 
+    .input-with-btn {
+      display: flex;
+      gap: 6px;
     }
 
-    .timestamp-box { 
-      background: #f8fafc; 
-      border: 1px dashed var(--accent); 
-      padding: 12px; 
-      border-radius: 8px; 
-      margin: 16px 0; 
+    .btn-now {
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 44px;
+    }
+
+    .timestamp-box {
+      background: #f8fafc;
+      border: 1px dashed var(--accent);
+      padding: 8px;
+      border-radius: 8px;
+      margin: 10px 0;
     }
 
     .btn-save-data {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background: var(--success);
       color: white;
       border: none;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 0.9rem;
       cursor: pointer;
-      margin-top: 8px;
-      margin-bottom: 14px;
-      min-height: 52px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+      min-height: 46px;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-save-data:active { opacity: 0.9; transform: scale(0.99); }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
-    .btn-save-data:active { background: #15803d; }
 
-    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button.btn-action { 
-      padding: 12px 8px; 
-      border: none; 
-      border-radius: 8px; 
-      font-weight: 700; 
-      cursor: pointer; 
-      color: white; 
-      font-size: 0.9rem; 
-      min-height: 48px; 
+    button.btn-action {
+      padding: 10px 6px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      font-size: 0.85rem;
+      min-height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    button.btn-action:active { opacity: 0.85; }
+
+    button.btn-action:active { opacity: 0.85; transform: scale(0.98); }
 
     .btn-gate-in { background: #2563eb; }
     .btn-bay-in { background: #d97706; }
     .btn-bay-out { background: #7c3aed; }
     .btn-gate-out { background: #0f172a; }
     
-    .action-cell { display: flex; gap: 8px; justify-content: flex-end; }
-    .btn-select { 
-      background: #64748b; 
-      color: white; 
-      border: none; 
-      padding: 0 12px; 
-      font-size: 0.82rem; 
-      font-weight: 600; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      min-height: 44px; 
-    }
-    .btn-delete { 
-      background: var(--danger); 
-      color: white; 
-      border: none; 
-      padding: 0 12px; 
-      font-size: 0.82rem; 
-      font-weight: 600; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      min-height: 44px; 
+    .action-cell {
+      display: flex;
+      gap: 4px;
+      justify-content: flex-end;
     }
 
-    .table-container { 
-      overflow-x: auto; 
-      -webkit-overflow-scrolling: touch; 
-      border-radius: 8px;
-      border: 1px solid var(--border);
+    .btn-select {
+      background: #64748b;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      min-height: 32px;
     }
-    
-    table { width: 100%; border-collapse: collapse; background: #fff; }
-    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.9rem; white-space: nowrap; }
-    th { background: #f8fafc; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; position: sticky; top: 0; }
 
-    .time-badge { padding: 6px 10px; border-radius: 16px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+    .btn-delete {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      min-height: 32px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 2px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      position: sticky;
+      top: 0;
+    }
+
+    .time-badge {
+      padding: 3px 6px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
     .time-normal { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     .time-exceeded { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
 
-    .chart-container { position: relative; height: 260px; width: 100%; display: flex; justify-content: center; }
-
-    /* Mobile Enhancements for Extra-Small Screens */
-    @media (max-width: 480px) {
-      body { padding: 8px; }
-      header { padding: 12px; }
-      header h1 { font-size: 1rem; }
-      .kpi-card { padding: 10px 12px; }
-      .kpi-value { font-size: 1.25rem; }
-      .btn-grid { grid-template-columns: 1fr; }
-      .action-cell { flex-direction: row; }
+    .chart-container {
+      position: relative;
+      height: 200px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
   </style>
 </head>
@@ -264,7 +364,7 @@
     <header>
       <h1>TRT - Haw Terminal</h1>
       <div class="header-controls">
-        <button class="btn-refresh" onclick="fetchDashboard()">🔄 Refresh</button>
+        <button class="btn-refresh" onclick="fetchDashboard()">🔄 Sync</button>
         <span id="status-indicator">Ready</span>
       </div>
     </header>
@@ -273,15 +373,15 @@
     <div class="kpi-row">
       <div class="kpi-card">
         <div>
-          <div class="kpi-title">Sum of Trucks Today</div>
+          <div class="kpi-title">Sum Today</div>
           <div class="kpi-value" id="kpi-trucks-today">0</div>
         </div>
         <div class="kpi-icon">🚚</div>
       </div>
       <div class="kpi-card">
         <div>
-          <div class="kpi-title">Average TRT</div>
-          <div class="kpi-value" id="kpi-avg-trt">0.0 <span style="font-size:0.85rem; font-weight:600;">hrs</span></div>
+          <div class="kpi-title">Avg TRT</div>
+          <div class="kpi-value" id="kpi-avg-trt">0.0 <span style="font-size:0.75rem; font-weight:600;">hrs</span></div>
         </div>
         <div class="kpi-icon">⏱️</div>
       </div>
@@ -295,7 +395,7 @@
           
           <div class="form-group">
             <label>Truck Plate Number *</label>
-            <input type="text" id="truckId" placeholder="e.g., KAA-123X" required autocomplete="off">
+            <input type="text" id="truckId" placeholder="e.g., KAA-123X" autocomplete="off" required>
           </div>
 
           <div class="form-group">
@@ -355,7 +455,7 @@
           <!-- OC REMARK / OTHER DELAY CAUSE BOX -->
           <div class="form-group">
             <label>OC Remark / Other Delay Cause</label>
-            <textarea id="ocRemark" rows="2" placeholder="Specify delay reason or add notes..."></textarea>
+            <textarea id="ocRemark" rows="2" placeholder="Notes or custom delay reason..."></textarea>
           </div>
 
           <div class="timestamp-box">
@@ -381,15 +481,15 @@
       <!-- Live Active Yard Data -->
       <div>
         <div class="card">
-          <h3>🅿️ Waiting for Bay (Parking Area)</h3>
+          <h3>🅿️ Waiting for Bay</h3>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
                   <th>Truck Plate</th>
                   <th>OC Name</th>
-                  <th>Dwell Time</th>
-                  <th style="text-align: right;">Actions</th>
+                  <th>Dwell</th>
+                  <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody id="parking-table-body"></tbody>
@@ -398,15 +498,15 @@
         </div>
 
         <div class="card">
-          <h3>🏭 At Bay (Loading / Unloading)</h3>
+          <h3>🏭 At Bay (Loading)</h3>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
                   <th>Truck Plate</th>
                   <th>OC Name</th>
-                  <th>Dwell Time</th>
-                  <th style="text-align: right;">Actions</th>
+                  <th>Dwell</th>
+                  <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody id="bay-table-body"></tbody>
@@ -415,7 +515,7 @@
         </div>
 
         <div class="card">
-          <h3>📊 Delay Reason Contribution</h3>
+          <h3>📊 Delay Causes</h3>
           <div class="chart-container">
             <canvas id="delayChart"></canvas>
           </div>
@@ -447,7 +547,7 @@
         .then(data => renderDashboard(data))
         .catch(err => {
           console.error('Error:', err);
-          document.getElementById('status-indicator').innerText = 'Fetch Error';
+          document.getElementById('status-indicator').innerText = 'Error';
         });
     }
 
@@ -456,7 +556,7 @@
       
       if (data.summary) {
         document.getElementById('kpi-trucks-today').innerText = data.summary.trucksToday || 0;
-        document.getElementById('kpi-avg-trt').innerHTML = `${data.summary.avgTrtHours || '0.0'} <span style="font-size:0.85rem; font-weight:600;">hrs</span>`;
+        document.getElementById('kpi-avg-trt').innerHTML = `${data.summary.avgTrtHours || '0.0'} <span style="font-size:0.75rem; font-weight:600;">hrs</span>`;
       }
 
       if (!data.activeTrucks) return;
@@ -480,13 +580,13 @@
         const dwellBadge = `<span class="time-badge ${colorClass}">${t.totalDwell}</span>`;
 
         const rowHtml = `<tr>
-          <td><strong style="font-size:0.95rem; color:var(--primary);">${t.truckId}</strong></td>
+          <td><strong style="font-size:0.88rem; color:var(--primary);">${t.truckId}</strong></td>
           <td>${t.ocName || '-'}</td>
           <td>${dwellBadge}</td>
           <td style="text-align: right;">
             <div class="action-cell">
               <button class="btn-select" onclick="selectTruck(${index})">Select</button>
-              <button class="btn-delete" onclick="deleteTruck('${t.truckId}')">Delete</button>
+              <button class="btn-delete" onclick="deleteTruck('${t.truckId}')">X</button>
             </div>
           </td>
         </tr>`;
@@ -508,10 +608,10 @@
       });
 
       if (parkingCount === 0) {
-        parkingTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">No trucks waiting for bay</td></tr>';
+        parkingTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:12px;">No trucks waiting</td></tr>';
       }
       if (bayCount === 0) {
-        bayTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">No trucks currently at loading bays</td></tr>';
+        bayTbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:12px;">No trucks at bays</td></tr>';
       }
 
       renderDelayChart(delayCounts);
@@ -533,9 +633,7 @@
     }
 
     function deleteTruck(truckPlate) {
-      if (!confirm(`Are you sure you want to delete truck ${truckPlate} from active yard?`)) {
-        return;
-      }
+      if (!confirm(`Delete truck ${truckPlate}?`)) return;
 
       document.getElementById('status-indicator').innerText = 'Deleting...';
 
@@ -603,9 +701,9 @@
         customTimestamp: document.getElementById('customTimestamp').value
       };
 
-      if (!payload.truckId) return alert('Please enter or select a Truck Plate Number');
+      if (!payload.truckId) return alert('Enter or select a Truck Plate');
 
-      document.getElementById('status-indicator').innerText = 'Processing...';
+      document.getElementById('status-indicator').innerText = 'Saving...';
 
       fetch(SCRIPT_URL, {
         method: 'POST',
