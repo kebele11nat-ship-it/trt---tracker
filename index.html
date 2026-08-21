@@ -129,7 +129,7 @@
       <div class="kpi-card">
         <div>
           <div class="kpi-title">Average TRT</div>
-          <div class="kpi-value" id="kpi-avg-trt">0 <span style="font-size:0.85rem; font-weight:600;">mins</span></div>
+          <div class="kpi-value" id="kpi-avg-trt">0.0 <span style="font-size:0.85rem; font-weight:600;">hrs</span></div>
         </div>
         <div class="kpi-icon">⏱️</div>
       </div>
@@ -304,7 +304,7 @@
       
       if (data.summary) {
         document.getElementById('kpi-trucks-today').innerText = data.summary.trucksToday || 0;
-        document.getElementById('kpi-avg-trt').innerHTML = `${data.summary.avgTrtMins || 0} <span style="font-size:0.85rem; font-weight:600;">mins</span>`;
+        document.getElementById('kpi-avg-trt').innerHTML = `${data.summary.avgTrtHours || '0.0'} <span style="font-size:0.85rem; font-weight:600;">hrs</span>`;
       }
 
       if (!data.activeTrucks) return;
@@ -323,8 +323,8 @@
       data.activeTrucks.forEach((t, index) => {
         if (t.gateOutRaw && t.gateOutRaw.trim() !== '') return;
 
-        const mins = parseInt(t.totalDwell) || 0;
-        const colorClass = mins > 180 ? 'time-exceeded' : 'time-normal';
+        const hours = parseFloat(t.dwellHoursNum) || 0;
+        const colorClass = hours > 3.0 ? 'time-exceeded' : 'time-normal';
         const dwellBadge = `<span class="time-badge ${colorClass}">${t.totalDwell}</span>`;
 
         const rowHtml = `<tr>
