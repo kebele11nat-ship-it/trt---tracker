@@ -45,7 +45,8 @@
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase; }
     
-    input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; background: #fafafa; min-height: 44px; }
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; background: #fafafa; min-height: 44px; }
+    textarea { font-family: inherit; resize: vertical; min-height: 60px; }
     
     .input-with-btn { display: flex; gap: 8px; }
     .btn-now { background: #0284c7; color: white; border: none; border-radius: 8px; padding: 0 16px; font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; min-height: 44px; }
@@ -176,6 +177,12 @@
               <option value="pallet shortage">pallet shortage</option>
               <option value="erp malfunction">erp malfunction</option>
             </select>
+          </div>
+
+          <!-- OC REMARK / OTHER DELAY CAUSE BOX -->
+          <div class="form-group">
+            <label>OC Remark / Other Delay Cause</label>
+            <textarea id="ocRemark" rows="2" placeholder="Specify if delay reason is not in the list or add operational notes..."></textarea>
           </div>
 
           <div class="timestamp-box">
@@ -344,6 +351,7 @@
       document.getElementById('ocName').value = truck.ocName || '';
       document.getElementById('driverName').value = truck.driverName || '';
       document.getElementById('delayReason').value = truck.delayReason || '';
+      document.getElementById('ocRemark').value = truck.ocRemark || '';
       
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -415,6 +423,7 @@
         ocName: document.getElementById('ocName').value,
         driverName: document.getElementById('driverName').value.trim(),
         delayReason: document.getElementById('delayReason').value,
+        ocRemark: document.getElementById('ocRemark').value.trim(),
         customTimestamp: document.getElementById('customTimestamp').value
       };
 
@@ -431,6 +440,7 @@
       .then(res => {
         alert(res.message);
         document.getElementById('truckId').value = '';
+        document.getElementById('ocRemark').value = '';
         document.getElementById('customTimestamp').value = '';
         fetchDashboard();
       })
