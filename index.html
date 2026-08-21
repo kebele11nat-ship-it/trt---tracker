@@ -304,7 +304,14 @@
       
       if (data.summary) {
         document.getElementById('kpi-trucks-today').innerText = data.summary.trucksToday || 0;
-        document.getElementById('kpi-avg-trt').innerHTML = `${data.summary.avgTrtHours || '0.0'} <span style="font-size:0.85rem; font-weight:600;">hrs</span>`;
+        
+        const avgVal = parseFloat(data.summary.avgTrtHours) || 0.0;
+        const trtElement = document.getElementById('kpi-avg-trt');
+        
+        // Dynamic Color Logic: Green if < 6 hrs, Red if >= 6 hrs
+        const textColor = avgVal < 6.0 ? 'var(--success)' : 'var(--danger)';
+        trtElement.style.color = textColor;
+        trtElement.innerHTML = `${avgVal.toFixed(1)} <span style="font-size:0.85rem; font-weight:600;">hrs</span>`;
       }
 
       if (!data.activeTrucks) return;
@@ -324,7 +331,7 @@
         if (t.gateOutRaw && t.gateOutRaw.trim() !== '') return;
 
         const hours = parseFloat(t.dwellHoursNum) || 0;
-        const colorClass = hours > 3.0 ? 'time-exceeded' : 'time-normal';
+        const colorClass = hours >= 6.0 ? 'time-exceeded' : 'time-normal';
         const dwellBadge = `<span class="time-badge ${colorClass}">${t.totalDwell}</span>`;
 
         const rowHtml = `<tr>
