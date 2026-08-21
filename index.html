@@ -17,6 +17,7 @@
       --text-muted: #64748b;
       --danger: #dc2626;
       --danger-hover: #b91c1c;
+      --success: #16a34a;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -53,7 +54,28 @@
 
     .timestamp-box { background: #f8fafc; border: 1px dashed var(--accent); padding: 10px; border-radius: 8px; margin: 12px 0; }
 
-    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    /* SAVE BUTTON STYLING */
+    .btn-save-data {
+      width: 100%;
+      padding: 12px;
+      background: var(--success);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-save-data:hover { background: #15803d; }
+
+    .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button.btn-action { padding: 12px 8px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; font-size: 0.9rem; min-height: 48px; }
     .btn-gate-in { background: #2563eb; }
     .btn-bay-in { background: #d97706; }
@@ -192,6 +214,9 @@
               <button class="btn-now" type="button" onclick="setNow('customTimestamp')">Now</button>
             </div>
           </div>
+
+          <!-- SAVE / UPDATE DATA BUTTON AT TOP -->
+          <button class="btn-save-data" onclick="submitAction('UPDATE_DATA')">💾 Save / Update Info</button>
           
           <div class="btn-grid">
             <button class="btn-action btn-gate-in" onclick="submitAction('GATE_IN')">1. Gate IN</button>
